@@ -36,8 +36,8 @@ target-version = ['py38']
 
 [tool.ruff]
 line-length = 88
-select = ["E", "F", "W", "I"]
-fixable = ["I"]
+lint.select = ["E", "F", "W", "I"]
+lint.fixable = ["I"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

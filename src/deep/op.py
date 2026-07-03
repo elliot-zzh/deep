@@ -2,6 +2,7 @@ import numpy as np
 from .tensor import *
 from .graph import *
 
+
 def exp(input: Tensor):
     input_np = input.to_np()
     # TODO: requires refactorization
@@ -10,6 +11,7 @@ def exp(input: Tensor):
         res.requires_grad = True
         res.dep = Exp(input)
     return res
+
 
 def log(input: Tensor):
     input_np = input.to_np()

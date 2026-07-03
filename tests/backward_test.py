@@ -3,7 +3,7 @@ import numpy as np
 
 from deep import *
 
-'''
+"""
 def test_add():
     return True
 
@@ -31,4 +31,4 @@ def test_log():
 def test_composition():
     return True
     
-'''
+"""
