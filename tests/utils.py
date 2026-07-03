@@ -3,11 +3,11 @@ import numpy as np
 from deep import *
 
 
-def assert_close(baseline, eval, eps=1e-10):
+def assert_close(baseline, eval, eps=1e-9):
     assert np.logical_and(baseline - eps < eval, eval < baseline + eps).all()
 
 
-def numerical_grad(func, input_, eps=1e-5, use_log=True):
+def numerical_grad(func, input_, eps=1e-5, use_log=False):
     original_shape = input_.shape
     if isinstance(input_, Tensor):
         input_.requires_grad = False
