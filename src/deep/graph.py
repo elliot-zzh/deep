@@ -16,6 +16,7 @@ class Add(Op):
         self.sub = sub
 
     def grad(self, grad):
+        # FIXME: handle operands that is not Tensor
         self.a1.backward(grad)
         if self.sub:
             self.a2.backward(-1 * grad)
