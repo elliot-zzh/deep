@@ -116,3 +116,15 @@ def test_log():
     input = Tensor(input_np)
     res = log(input)
     assert (res.to_np() == np.log(input_np)).all()
+
+
+def test_sum():
+    # test full reduction
+    input_np = np.random.rand(3, 4)
+    input = Tensor(input_np)
+    res = sum(input)
+    assert res.to_np() == np.sum(input_np)
+
+    # test selective reduction
+    res = sum(input, axis=1)
+    assert (res.to_np() == np.sum(input_np, axis=1)).all()

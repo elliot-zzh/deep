@@ -19,7 +19,6 @@ class Add(Op):
         self.sub = sub
 
     def grad(self, grad):
-        # FIXME: handle operands that is not Tensor
         if self.a1 is not None:
             self.a1.backward(grad)
         if self.a2 is None:
@@ -104,3 +103,17 @@ class Pow(Op):
             self.a1.backward(self.a2_np * (self.a1_np) ** (self.a2_np - 1) * grad)
         if self.a2 is not None:
             self.a2.backward(np.log(self.a1_np) * (self.a1_np) ** (self.a2_np) * grad)
+
+
+class Sum(Op):
+    # TODO: follow numpy or torch?
+    def __init__(self, input: Tensor, axis=None, keepdims=False):
+        self.input = input
+        self.axis = axis
+        self.keepdims = keepdims
+
+    def grad(self, grad):
+        if self.keepdims or self.axis is None:
+            self.input.backward(grad)
+        else:
+            self.input.backward(grad.expand_dims(self.axis))

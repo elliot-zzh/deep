@@ -15,6 +15,8 @@ class Tensor(np.ndarray):
     ):
         if isinstance(arg0, np.ndarray):
             obj = arg0.view(subtype)  # convert from ndarray
+        elif isinstance(arg0, np.generic):
+            obj = np.array(arg0).view(subtype)
         else:
             obj = super().__new__(subtype, arg0, dtype, buffer, offset, strides, order)
 
@@ -62,8 +64,14 @@ class Tensor(np.ndarray):
             return Tensor(result_np, requires_grad=False)
 
         # if requires_grad, construct graph
+        # TODO: implement gradient computation for other methods
         if ufunc is np.add:
-            res = Tensor(result_np, dep=Add(*inputs))
+            if method == "__call__":
+                res = Tensor(result_np, dep=Add(*inputs))
+            elif method == "reduce":
+                res = Tensor(result_np, dep=Sum(*inputs, **kwargs))
+            else:
+                return NotImplemented
         elif ufunc is np.subtract:
             res = Tensor(result_np, dep=Add(*inputs, sub=True))
         elif ufunc is np.multiply:
