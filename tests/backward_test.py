@@ -91,10 +91,35 @@ def test_mul():
 """
 def test_matmul():
     return True
+"""
+
 
 def test_div():
-    return True
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
+    a1, a2 = Tensor(a1_np), Tensor(a2_np)
+    res = (a1 / a2).sum()
+    res.backward()
 
+    func1 = lambda x: sum(sum(x / a2, axis=-1), axis=-1)
+    func2 = lambda x: sum(sum(a1 / x, axis=-1), axis=-1)
+
+    assert_close(numerical_grad(func1, a1).to_np(), a1.grad)
+    assert_close(numerical_grad(func2, a2).to_np(), a2.grad)
+
+    # test with broadcast
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 1)
+    a1, a2 = Tensor(a1_np), Tensor(a2_np)
+    res = (a1 / a2).sum()
+    res.backward()
+
+    func1 = lambda x: sum(sum(x / a2, axis=-1), axis=-1)
+    func2 = lambda x: sum(sum(a1 / x, axis=-1), axis=-1)
+
+    assert_close(numerical_grad(func1, a1).to_np(), a1.grad)
+    assert_close(numerical_grad(func2, a2).to_np(), a2.grad, eps=1e-5)
+
+
+"""
 def test_pow():
     return True
 

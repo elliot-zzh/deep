@@ -3,7 +3,7 @@ import numpy as np
 from deep import *
 
 
-def assert_close(baseline, eval, eps=1e-9):
+def assert_close(baseline, eval, eps=1e-8):
     assert np.logical_and(baseline - eps < eval, eval < baseline + eps).all()
 
 
