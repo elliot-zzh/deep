@@ -2,6 +2,8 @@ import numpy as np
 from .tensor import Tensor
 from abc import ABC, abstractmethod
 
+from .utils import *
+
 
 class Op(ABC):
     @abstractmethod
@@ -19,14 +21,24 @@ class Add(Op):
         self.sub = sub
 
     def grad(self, grad):
+        # TODO: handle when a1 or a2 has been broadcasted, we need to sum the gradient along the broadcasted axis
         if self.a1 is not None:
-            self.a1.backward(grad)
+            grad_ = grad
+            if grad.shape != self.a1.shape:
+                dim_to_reduce = detect_broadcast_dim(self.a1.shape, grad.shape)
+                for dim, keepdims in dim_to_reduce:
+                    grad_ = grad_.sum(axis=dim, keepdims=keepdims)
+            self.a1.backward(grad_)
         if self.a2 is None:
             return
         if self.sub:
-            self.a2.backward(-1 * grad)
-        else:
-            self.a2.backward(grad)
+            grad = -grad
+        grad_ = grad
+        if grad.shape != self.a2.shape:
+            dim_to_reduce = detect_broadcast_dim(self.a2.shape, grad.shape)
+            for dim, keepdims in dim_to_reduce:
+                grad_ = grad_.sum(axis=dim, keepdims=keepdims)
+        self.a2.backward(grad_)
 
 
 class Mul(Op):
@@ -37,10 +49,21 @@ class Mul(Op):
         self.a1, self.a2 = (i if isinstance(i, Tensor) else None for i in [a1, a2])
 
     def grad(self, grad):
+        # TODO: handle when a1 or a2 has been broadcasted, we need to sum the gradient along the broadcasted axisq
         if self.a1 is not None:
-            self.a1.backward(grad * self.a2_np())
+            grad_ = grad * self.a2_np
+            if grad.shape != self.a1.shape:
+                dim_to_reduce = detect_broadcast_dim(self.a1.shape, grad.shape)
+                for dim, keepdims in dim_to_reduce:
+                    grad_ = grad_.sum(axis=dim, keepdims=keepdims)
+            self.a1.backward(grad_)
         if self.a2 is not None:
-            self.a2.backward(self.a1_np() * grad)
+            grad_ = self.a1_np * grad
+            if grad.shape != self.a2.shape:
+                dim_to_reduce = detect_broadcast_dim(self.a2.shape, grad.shape)
+                for dim, keepdims in dim_to_reduce:
+                    grad_ = grad_.sum(axis=dim, keepdims=keepdims)
+            self.a2.backward(grad_)
 
 
 class Div(Op):
@@ -51,6 +74,7 @@ class Div(Op):
         self.a1, self.a2 = (i if isinstance(i, Tensor) else None for i in [a1, a2])
 
     def grad(self, grad):
+        # TODO: handle when a1 or a2 has been broadcasted, we need to sum the gradient along the broadcasted axis
         if self.a1 is not None:
             self.a1.backward(grad * self.a2.to_np())
         if self.a2 is not None:

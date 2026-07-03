@@ -1,0 +1,8 @@
+def detect_broadcast_dim(from_, to_):
+    detected = []
+    for i in range(-1, -len(to_) - 1, -1):
+        if i < -len(from_):
+            detected.append((i + len(to_), False))
+        elif from_[i] == 1 and to_[i] != 1:
+            detected.append((i + len(to_), True))  # True tp keepdims
+    return detected
