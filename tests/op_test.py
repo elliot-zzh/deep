@@ -89,11 +89,19 @@ def test_div():
 
 
 def test_pow():
-    base_np = np.random.rand(3, 4)
-    exponent = 2.5
-    base = Tensor(base_np)
-    res = base**exponent
-    assert (res.to_np() == base_np**exponent).all()
+    # general pow
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
+    try_ufunc_call(np.power, a1_np, a2_np)
+
+    # pow with broadcast
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(4)
+    try_ufunc_call(np.power, a1_np, a2_np)
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 1)
+    try_ufunc_call(np.power, a1_np, a2_np)
+
+    # pow with scalar
+    a1_np, a2_np = np.random.rand(3, 4), 5
+    try_ufunc_call(np.power, a1_np, a2_np)
 
 
 def test_exp():

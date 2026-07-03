@@ -93,10 +93,14 @@ class Log(Op):
 
 
 class Pow(Op):
-    def __init__(self, base: Tensor, exponent):
-        self.base, self.exponent = base, exponent
+    def __init__(self, a1, a2):
+        self.a1_np, self.a2_np = (
+            i.to_np() if isinstance(i, Tensor) else i for i in [a1, a2]
+        )
+        self.a1, self.a2 = (i if isinstance(i, Tensor) else None for i in [a1, a2])
 
     def grad(self, grad):
-        self.input.backward(
-            self.exponent * (self.base.to_np()) ** (self.exponent - 1) * grad
-        )
+        if self.a1 is not None:
+            self.a1.backward(self.a2_np * (self.a1_np) ** (self.a2_np - 1) * grad)
+        if self.a2 is not None:
+            self.a2.backward(np.log(self.a1_np) * (self.a1_np) ** (self.a2_np) * grad)

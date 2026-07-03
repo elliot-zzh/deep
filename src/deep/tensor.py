@@ -28,9 +28,8 @@ class Tensor(np.ndarray):
         self.requires_grad = getattr(obj, "requires_grad", False)
         self.dep = getattr(obj, "dep", None)
 
-    # TODO: replace all to_np with view(np.ndarray)
     def to_np(self):
-        return np.asarray(super())
+        return self.view(np.ndarray)
 
     def backward(self, grad=None):
         if not self.requires_grad:
@@ -75,22 +74,19 @@ class Tensor(np.ndarray):
             res = Tensor(result_np, dep=MatMul(*inputs))
         elif ufunc is np.exp:
             res = Tensor(result_np, dep=Exp(*inputs))
+        elif ufunc is np.exp2:
+            res = Tensor(result_np, dep=Exp(Mul(*inputs, np.log(2))))
         elif ufunc is np.log:
             res = Tensor(result_np, dep=Log(*inputs))
+        elif ufunc is np.log2:
+            res = Tensor(result_np, dep=Div(Log(*inputs), np.log(2)))
+        elif ufunc is np.log10:
+            res = Tensor(result_np, dep=Div(Log(*inputs), np.log(10)))
+        elif ufunc is np.pow:
+            res = Tensor(result_np, dep=Pow(*inputs))
         else:
             return NotImplemented
 
-        return res
-
-    def __pow__(
-        self, other, mod=None
-    ):  # TODO: more available types for other/exponent. currently non ndarray scalars
-        base = self.to_np()
-        # TODO: requires refactorization
-        res = (base**other).view(Tensor)
-        if self.requires_grad:
-            res.requires_grad = True
-            res.dep = Pow(self, other)
         return res
 
 
