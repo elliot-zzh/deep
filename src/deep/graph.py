@@ -8,7 +8,7 @@ from .utils import *
 class Op(ABC):
     @abstractmethod
     # TODO: Design: what is the type of grad? Tensor or np.ndarray
-    def grad(self, grad):
+    def backward(self, grad):
         pass
 
 
@@ -20,7 +20,7 @@ class Add(Op):
         self.a1, self.a2 = (i if isinstance(i, Tensor) else None for i in [a1, a2])
         self.sub = sub
 
-    def grad(self, grad):
+    def backward(self, grad):
         if self.a1 is not None:
             self.a1.backward(grad)
         if self.a2 is None:
@@ -37,7 +37,7 @@ class Mul(Op):
         )
         self.a1, self.a2 = (i if isinstance(i, Tensor) else None for i in [a1, a2])
 
-    def grad(self, grad):
+    def backward(self, grad):
         if self.a1 is not None:
             self.a1.backward(grad * self.a2_np)
         if self.a2 is not None:
@@ -51,7 +51,7 @@ class Div(Op):
         )
         self.a1, self.a2 = (i if isinstance(i, Tensor) else None for i in [a1, a2])
 
-    def grad(self, grad):
+    def backward(self, grad):
         if self.a1 is not None:
             self.a1.backward(grad / self.a2_np)
         if self.a2 is not None:
@@ -65,7 +65,7 @@ class MatMul(Op):
         )
         self.a1, self.a2 = (i if isinstance(i, Tensor) else None for i in [a1, a2])
 
-    def grad(self, grad):
+    def backward(self, grad):
         if self.a1 is not None:
             self.a1.backward(grad @ self.a2.to_np().swapaxes(-1, -2))
         if self.a2 is not None:
@@ -78,7 +78,7 @@ class Exp(Op):
     ):  # node of exp is introduced only when the input is a Tensor
         self.input = input
 
-    def grad(self, grad):
+    def backward(self, grad):
         self.input.backward(np.exp(self.input.to_np()) * grad)
 
 
@@ -88,7 +88,7 @@ class Log(Op):
     ):  # node of log is introduced only when the input is a Tensor
         self.input = input
 
-    def grad(self, grad):
+    def backward(self, grad):
         self.input.backward(1 / self.input.to_np() * grad)
 
 
@@ -99,30 +99,41 @@ class Pow(Op):
         )
         self.a1, self.a2 = (i if isinstance(i, Tensor) else None for i in [a1, a2])
 
-    def grad(self, grad):
+    def backward(self, grad):
         if self.a1 is not None:
             self.a1.backward(self.a2_np * (self.a1_np) ** (self.a2_np - 1) * grad)
         if self.a2 is not None:
             self.a2.backward(np.log(self.a1_np) * (self.a1_np) ** (self.a2_np) * grad)
 
 
-class Sum(Op):
-    # TODO: follow numpy or torch?
-    def __init__(self, input: Tensor, axis=None, keepdims=False):
+class ReductionWrapper(Op):
+    def __init__(self, input: Tensor, axis, keepdims):
         self.input = input
         self.axis = axis
         self.keepdims = keepdims
 
-    def grad(self, grad):
+    def backward(self, grad):
         if self.keepdims or self.axis is None:
             self.input.backward(grad)
         else:
-            self.input.backward(grad.expand_dims(self.axis))
+            self.input.backward(np.expand_dims(grad, self.axis))
+
+
+# We don't need Sum node since it is equivalent to a ReductionWrapper node
 
 
 class Abs(Op):
     def __init__(self, input: Tensor):
         self.input = input
 
-    def grad(self, grad):
-        grad = np.where(grad < 0, -grad, grad)
+    def backward(self, grad):
+        self.input.backward(np.where(grad < 0, -grad, grad))
+
+
+class Mask(Op):
+    def __init__(self, input: Tensor, mask):
+        self.input = input
+        self.mask = mask
+
+    def backward(self, grad):
+        self.input.backward(np.where(self.mask, grad, 0.0))

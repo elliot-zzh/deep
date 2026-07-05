@@ -54,7 +54,7 @@ class Tensor(np.ndarray):
                 grad_ = grad_.sum(axis=dim, keepdims=keepdims)
             self.grad += grad_
         if self.dep is not None:
-            self.dep.grad(self.grad)  # trigger graph
+            self.dep.backward(self.grad)  # trigger graph
 
     # override operations
     def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
@@ -81,7 +81,7 @@ class Tensor(np.ndarray):
             elif method == "reduce":
                 axis = getattr(kwargs, "axis", None)
                 keepdims = getattr(kwargs, "keepdims", False)
-                res = Tensor(result_np, dep=Sum(*inputs, axis=axis, keepdims=keepdims))
+                res = Tensor(result_np, dep=ReductionWrapper(*inputs, axis, keepdims))
             else:
                 return NotImplemented
         elif ufunc is np.subtract:

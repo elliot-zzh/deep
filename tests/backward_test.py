@@ -181,6 +181,26 @@ def test_gradient_from_multiple_paths():
     assert_close(numerical_grad(func, input), input.grad)
 
 
+def test_max():
+    input_np = np.random.rand(3, 4)
+    input = Tensor(input_np)
+    res = sum(max(input, axis=-1))
+    res.backward()
+
+    func = lambda x: sum(max(x, axis=-1), axis=-1)
+    assert_close(numerical_grad(func, input), input.grad)
+
+
+def test_min():
+    input_np = np.random.rand(3, 4)
+    input = Tensor(input_np)
+    res = sum(min(input, axis=-1))
+    res.backward()
+
+    func = lambda x: sum(min(x, axis=-1), axis=-1)
+    assert_close(numerical_grad(func, input), input.grad)
+
+
 """
 def test_composition():
     return True

@@ -124,12 +124,59 @@ def test_abs():
 
 
 def test_sum():
-    # test full reduction
     input_np = np.random.rand(3, 4)
     input = Tensor(input_np)
+
+    # test full reduction
     res = sum(input)
     assert res.to_np() == np.sum(input_np)
 
     # test selective reduction
     res = sum(input, axis=1)
     assert (res.to_np() == np.sum(input_np, axis=1)).all()
+
+
+def test_max():
+    input_np = np.random.rand(3, 4)
+    input = Tensor(input_np)
+
+    # test full reduction
+    # currently full reduction backcwarding not supported
+    """
+    res = max(input)
+    assert res.to_np() == np.max(input_np)
+    """
+
+    # test selective reduction
+    res = max(input, axis=1)
+    assert (res.to_np() == np.max(input_np, axis=1)).all()
+
+
+def test_min():
+    input_np = np.random.rand(3, 4)
+    input = Tensor(input_np)
+
+    # test full reduction
+    # currently full reduction backcwarding not supported
+    """
+    res = min(input)
+    assert res.to_np() == np.min(input_np)
+    """
+
+    # test selective reduction
+    res = min(input, axis=1)
+    assert (res.to_np() == np.min(input_np, axis=1)).all()
+
+
+def test_argmax():
+    input_np = np.random.rand(3, 4)
+    input = Tensor(input_np)
+    res = argmax(input, axis=1)
+    assert (res.to_np() == np.argmax(input_np, axis=1)).all()
+
+
+def test_argmin():
+    input_np = np.random.rand(3, 4)
+    input = Tensor(input_np)
+    res = argmin(input, axis=1)
+    assert (res.to_np() == np.argmin(input_np, axis=1)).all()
