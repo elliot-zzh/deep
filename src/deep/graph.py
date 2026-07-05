@@ -79,7 +79,7 @@ class Exp(Op):
         self.input = input
 
     def grad(self, grad):
-        self.input.backward(np.exp(input.to_np()) * grad)
+        self.input.backward(np.exp(self.input.to_np()) * grad)
 
 
 class Log(Op):
@@ -89,7 +89,7 @@ class Log(Op):
         self.input = input
 
     def grad(self, grad):
-        self.input.backward(1 / input.to_np() * grad)
+        self.input.backward(1 / self.input.to_np() * grad)
 
 
 class Pow(Op):

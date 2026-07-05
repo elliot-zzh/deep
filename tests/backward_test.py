@@ -138,15 +138,30 @@ def test_div():
     assert_close(numerical_grad(func2, a2).to_np(), a2.grad)
 
 
+def test_exp():
+    input_np = np.random.rand(10)
+    input = Tensor(input_np)
+    res = sum(exp(input))
+    res.backward()
+
+    func = lambda x: sum(exp(x), axis=-1)
+    assert_close(numerical_grad(func, input), input.grad)
+
+
+def test_log():
+    input_np = np.random.rand(10)
+    input = Tensor(input_np)
+    res = sum(log(input))
+    res.backward()
+
+    func = lambda x: sum(log(x), axis=-1)
+    assert_close(numerical_grad(func, input), input.grad)
+
+
 """
 def test_pow():
     return True
 
-def test_exp():
-    return True
-
-def test_log():
-    return True
 
 def test_composition():
     return True
