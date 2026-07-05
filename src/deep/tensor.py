@@ -36,20 +36,23 @@ class Tensor(np.ndarray):
     def backward(self, grad=None):
         if not self.requires_grad:
             return
+        if self.grad is None:
+            self.grad = np.zeros(self.shape)
         if grad is None:
             # TODO: support Vector-Jacobian Product like pytorch
             assert self.size == 1  # must be scalar
-            self.grad = np.array([1.0])
+            self.grad += 1
         # otherwise receive gradient from graph
         elif grad.size == 1:
-            self.grad = np.tile(grad, self.shape)
+            self.grad += np.tile(grad, self.shape)
         elif grad.shape == self.shape:
-            self.grad = grad
+            self.grad += grad
         elif grad.shape != self.shape:
-            self.grad = grad
+            grad_ = grad
             dim_to_reduce = detect_broadcast_dim(self.shape, grad.shape)
             for dim, keepdims in dim_to_reduce:
-                self.grad = self.grad.sum(axis=dim, keepdims=keepdims)
+                grad_ = grad_.sum(axis=dim, keepdims=keepdims)
+            self.grad += grad_
         if self.dep is not None:
             self.dep.grad(self.grad)  # trigger graph
 

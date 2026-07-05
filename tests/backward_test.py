@@ -158,11 +158,30 @@ def test_log():
     assert_close(numerical_grad(func, input), input.grad)
 
 
-"""
 def test_pow():
-    return True
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
+    a1, a2 = Tensor(a1_np), Tensor(a2_np)
+    res = sum(a1**a2)
+    res.backward()
+
+    func1 = lambda x: sum(sum(x**a2, axis=-1), axis=-1)
+    func2 = lambda x: sum(sum(a1**x, axis=-1), axis=-1)
+
+    assert_close(numerical_grad(func1, a1).to_np(), a1.grad)
+    assert_close(numerical_grad(func2, a2).to_np(), a2.grad)
 
 
+def test_gradient_from_multiple_paths():
+    input_np = np.random.rand(10)
+    input = Tensor(input_np)
+    res = sum(input + input * input)
+    res.backward()
+
+    func = lambda x: sum(x + x * x, axis=-1)
+    assert_close(numerical_grad(func, input), input.grad)
+
+
+"""
 def test_composition():
     return True
     
