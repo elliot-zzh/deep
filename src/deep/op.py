@@ -2,7 +2,30 @@ import numpy as np
 from .tensor import *
 from .graph import *
 
-# TODO: should we implement add, sub, mul, div etc. here? (or just use np.add etc. directly)
+
+# implement add, sub, mul, div etc. here
+def add(a1, a2):
+    return a1.__array_ufunc__(np.add, "__call__", a1, a2)
+
+
+def sub(a1, a2):
+    return a1.__array_ufunc__(np.subtract, "__call__", a1, a2)
+
+
+def mul(a1, a2):
+    return a1.__array_ufunc__(np.multiply, "__call__", a1, a2)
+
+
+def div(a1, a2):
+    return a1.__array_ufunc__(np.divide, "__call__", a1, a2)
+
+
+def matmul(a1, a2):
+    return a1.__array_ufunc__(np.matmul, "__call__", a1, a2)
+
+
+def pow(a1, a2):
+    return a1.__array_ufunc__(np.pow, "__call__", a1, a2)
 
 
 def exp(input):

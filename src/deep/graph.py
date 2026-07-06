@@ -7,7 +7,6 @@ from .utils import *
 
 class Op(ABC):
     @abstractmethod
-    # TODO: Design: what is the type of grad? Tensor or np.ndarray
     def backward(self, grad):
         pass
 
