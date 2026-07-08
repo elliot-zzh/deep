@@ -76,10 +76,10 @@ c = a.tile(2, 2)                              # method‑style alternative
 ## Installation
 
 ```bash
-pip install deep_atomic
+pip install deep-atomic
 
 # or with uv
-uv add deep_atomic
+uv add deep-atomic
 ```
 
 ## Development
