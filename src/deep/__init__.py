@@ -1,7 +1,7 @@
-"""deep - A toy deep learning framework using numpy"""
+"""deep - A simple deep learning framework built upon numpy only"""
 
 __version__ = "0.1.0"
-__author__ = "Your Name <you@example.com>"  # TODO: complete info
+__author__ = "elliot_zh@proton.me"
 
 from .tensor import *
 from .op import *

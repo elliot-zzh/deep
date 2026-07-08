@@ -114,4 +114,4 @@ def repeats(input: Tensor, repeats, axis=None):
 
 
 def tile(input: Tensor, reps):
-    return input.tile(reps)
+    return input.tile(*reps)

@@ -401,7 +401,7 @@ def test_repeat_sequence_axis():
 def test_tile():
     input_np = np.random.rand(2, 3)
     input = Tensor(input_np)
-    res = ((input.tile((2, 2)) ** 2) + input.tile((2, 2))).sum()
+    res = ((input.tile(2, 2) ** 2) + input.tile(2, 2)).sum()
     res.backward()
 
     func = lambda x: ((tile(x, (2, 2)) ** 2) + tile(x, (2, 2))).sum()

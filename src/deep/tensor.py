@@ -158,7 +158,7 @@ class Tensor(np.ndarray):
             res.dep = Repeat(self, repeats, axis)
         return res
 
-    def tile(self, reps):
+    def tile(self, *reps):
         res = Tensor(np.tile(super(), reps), requires_grad=self.requires_grad)
         if self.requires_grad:
             res.dep = Tile(self, reps)
