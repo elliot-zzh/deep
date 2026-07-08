@@ -26,8 +26,11 @@ def numerical_grad(func, input_, eps=1e-5):
     X_minus = X_minus.reshape([input_.size] + list(original_shape))
 
     res = np.zeros([input_.size])
-    # central difference
+    # use a for loop to iterate through all parameters
+    # slower but ensure correct and more convenient operations in func
+    # e.g. .sum(axis=None) appeared in func will cause reduction of the added parameter dim, which is undesired
     for i in range(input_.size):
+        # central difference
         res[i] = (func(X_plus[i]) - func(X_minus[i])) / (eps * 2)
 
     return res.reshape(original_shape)
