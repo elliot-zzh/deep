@@ -25,7 +25,9 @@ def numerical_grad(func, input_, eps=1e-5):
     np.fill_diagonal(X_minus, X_minus.diagonal() - eps)
     X_minus = X_minus.reshape([input_.size] + list(original_shape))
 
+    res = np.zeros([input_.size])
     # central difference
-    res = (func(X_plus) - func(X_minus)) / (eps * 2)
+    for i in range(input_.size):
+        res[i] = (func(X_plus[i]) - func(X_minus[i])) / (eps * 2)
 
     return res.reshape(original_shape)

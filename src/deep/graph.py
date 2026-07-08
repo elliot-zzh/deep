@@ -190,3 +190,57 @@ class ExpandDims(SingleOp):
 
     def backward(self, grad):
         self.input.backward(grad.squeeze(self.axis))
+
+
+class Repeat(SingleOp):
+    def __init__(self, input: Tensor, repeats, axis=None):
+        super().__init__(input)
+        self.repeats = repeats
+        self.axis = axis
+
+    def backward(self, grad):
+        if isinstance(self.repeats, int):
+            if self.axis is None:
+                grad = grad.reshape(-1, self.repeats).sum(axis=-1)
+            else:
+                shape = list(grad.shape)
+                shape[self.axis] //= self.repeats
+                shape.insert(self.axis + 1, self.repeats)
+                grad = grad.reshape(shape).sum(axis=self.axis + 1)
+            self.input.backward(grad)
+        else:
+            if self.axis is None:
+                grad_ = np.zeros(len(self.repeats), dtype=grad.dtype)
+                start = 0
+                for i, r in enumerate(self.repeats):
+                    if r > 0:
+                        grad_[i] = grad[start : start + r].sum()
+                    start += r
+            else:
+                moved = np.moveaxis(grad, self.axis, 0)
+                grad_ = np.zeros(self.input.shape, dtype=grad.dtype)
+                start = 0
+                for i, r in enumerate(self.repeats):
+                    if r > 0:
+                        idx = [slice(None)] * self.input.ndim
+                        idx[self.axis] = i
+                        grad_[tuple(idx)] = moved[start : start + r].sum(axis=0)
+                    start += r
+            self.input.backward(grad_)
+
+
+class Tile(SingleOp):
+    def __init__(self, input: Tensor, reps):
+        super().__init__(input)
+        self.reps = reps
+
+    def backward(self, grad):
+        start = (grad.ndim - len(self.reps)) if grad.ndim > len(self.reps) else 0
+        for i, r in enumerate(self.reps, start=start):
+            shape = list(grad.shape)
+            shape[i] //= r
+            shape.insert(i + 1, r)
+            grad = grad.reshape(shape, order="F").sum(axis=i + 1)
+        if grad.ndim < len(self.reps):
+            grad = grad.reshape(self.input.shape)
+        self.input.backward(grad)

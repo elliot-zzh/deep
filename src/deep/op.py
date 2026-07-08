@@ -107,3 +107,11 @@ def squeeze(input: Tensor, axis):
 
 def expand_dims(input: Tensor, axis):
     return input.expand_dims(axis)
+
+
+def repeats(input: Tensor, repeats, axis=None):
+    return input.repeat(repeats, axis)
+
+
+def tile(input: Tensor, reps):
+    return input.tile(reps)

@@ -135,23 +135,34 @@ class Tensor(np.ndarray):
         return res
 
     def reshape(self, *target_shape):
-        return Tensor(
-            super().reshape(*target_shape),
-            requires_grad=True,
-            dep=Reshape(self, self.shape),
-        )
+        res = Tensor(super().reshape(*target_shape), requires_grad=self.requires_grad)
+        if self.requires_grad:
+            res.dep = Reshape(self, self.shape)
+        return res
 
     def squeeze(self, axis):
-        return Tensor(
-            super().squeeze(axis), requires_grad=True, dep=Squeeze(self, axis)
-        )
+        res = Tensor(super().squeeze(axis), requires_grad=self.requires_grad)
+        if self.requires_grad:
+            res.dep = Squeeze(self, axis)
+        return res
 
     def expand_dims(self, axis):
-        return Tensor(
-            np.expand_dims(super(), axis),
-            requires_grad=True,
-            dep=ExpandDims(self, axis),
-        )
+        res = Tensor(np.expand_dims(super(), axis), requires_grad=self.requires_grad)
+        if self.requires_grad:
+            res.dep = ExpandDims(self, axis)
+        return res
+
+    def repeat(self, repeats, axis=None):
+        res = Tensor(super().repeat(repeats, axis), requires_grad=self.requires_grad)
+        if self.requires_grad:
+            res.dep = Repeat(self, repeats, axis)
+        return res
+
+    def tile(self, reps):
+        res = Tensor(np.tile(super(), reps), requires_grad=self.requires_grad)
+        if self.requires_grad:
+            res.dep = Tile(self, reps)
+        return res
 
 
 from .graph import *  # avoid looped dependencies
