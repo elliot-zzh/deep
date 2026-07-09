@@ -426,3 +426,39 @@ def test_tile():
 
     func = lambda x: ((tile(x, (2, 2)) ** 2) + tile(x, (2, 2))).sum()
     assert_close(numerical_grad(func, input), input.grad)
+
+
+def test_where():
+    condition = np.random.choice(np.array([True, False]), size=(3, 4))
+    # test tensor and scalar
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(1)
+    a1, a2 = Tensor(a1_np), Tensor(a2_np, requires_grad=False)
+    res = where(condition, a1, a2).sum()
+    res.backward()
+
+    func = lambda x: sum(where(condition, x, a2))
+    assert_close(numerical_grad(func, a1), a1.grad)
+
+    # test tensor and tensor
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
+    a1, a2 = Tensor(a1_np), Tensor(a2_np)
+    res = where(condition, a1, a2).sum()
+    res.backward()
+
+    func1 = lambda x: sum(where(condition, x, a2))
+    func2 = lambda x: sum(where(condition, a1, x))
+
+    assert_close(numerical_grad(func1, a1), a1.grad)
+    assert_close(numerical_grad(func2, a2), a2.grad)
+
+    # test with broadcast
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 1)
+    a1, a2 = Tensor(a1_np), Tensor(a2_np)
+    res = where(condition, a1, a2).sum()
+    res.backward()
+
+    func1 = lambda x: sum(where(condition, x, a2))
+    func2 = lambda x: sum(where(condition, a1, x))
+
+    assert_close(numerical_grad(func1, a1), a1.grad)
+    assert_close(numerical_grad(func2, a2), a2.grad)

@@ -48,6 +48,7 @@ c = d ^ e                     # element-wise xor
 c = da.logical_not(d)         # element-wise not
 c = d.all(axis=-1)            # reduction of and operation
 c = d.any(axis=-1)            # reduction of or operation
+c = da.where(d, a, b)         # return elements chosen from a or b depending on condition
 
 c = da.sum(a)                               # shape: (1,)
 c = da.sum(a, axis=1)                       # shape: (3,)

@@ -15,3 +15,4 @@ def is_broadcastable(from_, to_):
     for i in range(-1, -len(to_) - 1, -1):
         res = res and (from_[i] == to_[i] or from_[i] == 1 and to_[i] != 1)
     return res
+

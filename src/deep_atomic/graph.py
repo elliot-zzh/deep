@@ -255,3 +255,17 @@ class Tile(SingleOp):
         if grad.ndim < len(self.reps):
             grad = grad.reshape(self.input.shape)
         self.input.backward(grad)
+
+# the condition is not differentiatable, so still two-operanded
+class Where(TwoOp):
+    def __init__(self, condition, a1, a2):
+        super().__init__(a1, a2)
+        if isinstance(condition, Tensor):
+            condition = condition.to_np()
+        self.condition = condition
+        
+    def backward(self, grad):
+        if self.a1 is not None:
+            self.a1.backward(np.where(self.condition, grad, 0))
+        if self.a2 is not None:
+            self.a2.backward(np.where(self.condition, 0, grad))

@@ -1,6 +1,7 @@
 import numpy as np
 from .tensor import *
 from .graph import *
+from .utils import *
 
 
 # implement add, sub, mul, div etc. here
@@ -138,3 +139,13 @@ def repeats(input: Tensor, repeats, axis=None):
 
 def tile(input: Tensor, reps):
     return input.tile(*reps)
+
+
+def where(condition, a1, a2):
+    requires_grad = False
+    for i in (a1, a2):
+        if isinstance(i, Tensor) and i.requires_grad:
+            requires_grad = True
+    res = Tensor(np.where(condition, a1, a2), requires_grad=requires_grad)
+    if res.requires_grad: res.dep = Where(condition, a1, a2)
+    return res
