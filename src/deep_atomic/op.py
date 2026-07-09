@@ -94,6 +94,18 @@ def argmin(input: Tensor, axis=-1, keepdims=False):
     return Tensor(
         np.argmin(input.to_np(), axis=axis, keepdims=keepdims), requires_grad=False
     )
+    
+    
+def fmax(a1, a2):
+    return a1.__array_ufunc__(np.fmax, '__call__', a1, a2)
+
+
+def fmin(a1, a2):
+    return a1.__array_ufunc__(np.fmin, '__call__', a1, a2)
+
+# unlike pytorch, fmax and maximum, fmin and minimum are the same since Deep Atomic currently doesn't handle NaN
+maximum = fmax
+minimum = fmin
 
 
 def softmax(input: Tensor, axis=-1, temperature=1):

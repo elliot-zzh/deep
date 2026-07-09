@@ -246,11 +246,9 @@ def test_max():
     input = Tensor(input_np)
 
     # test full reduction
-    # currently full reduction backcwarding not supported
-    """
     res = max(input)
     assert res.to_np() == np.max(input_np)
-    """
+
 
     # test selective reduction
     res = max(input, axis=1)
@@ -262,11 +260,8 @@ def test_min():
     input = Tensor(input_np)
 
     # test full reduction
-    # currently full reduction backcwarding not supported
-    """
     res = min(input)
     assert res.to_np() == np.min(input_np)
-    """
 
     # test selective reduction
     res = min(input, axis=1)
@@ -285,6 +280,38 @@ def test_argmin():
     input = Tensor(input_np)
     res = argmin(input, axis=1)
     assert (res.to_np() == np.argmin(input_np, axis=1)).all()
+    
+    
+def test_fmax():
+    # general add
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
+    try_ufunc_call(np.fmax, a1_np, a2_np)
+
+    # add with broadcast
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(4)
+    try_ufunc_call(np.fmax, a1_np, a2_np)
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 1)
+    try_ufunc_call(np.fmax, a1_np, a2_np)
+
+    # add with scalar
+    a1_np, a2_np = np.random.rand(3, 4), 0.5
+    try_ufunc_call(np.fmax, a1_np, a2_np)
+    
+    
+def test_fmin():
+    # general add
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
+    try_ufunc_call(np.fmin, a1_np, a2_np)
+
+    # add with broadcast
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(4)
+    try_ufunc_call(np.fmin, a1_np, a2_np)
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 1)
+    try_ufunc_call(np.fmin, a1_np, a2_np)
+
+    # add with scalar
+    a1_np, a2_np = np.random.rand(3, 4), 0.5
+    try_ufunc_call(np.fmin, a1_np, a2_np)
 
 
 def test_equal():

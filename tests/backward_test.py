@@ -420,6 +420,68 @@ def test_min():
     assert_close(expected_grad, input.grad)
 
 
+def test_fmax():
+    # test tensor + scalar
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(1)
+    a1, a2 = Tensor(a1_np), Tensor(a2_np, requires_grad=False)
+    res = fmax(a1, a2).sum()
+    res.backward()
+
+    func = lambda x: sum(fmax(x, a2))
+    assert_close(numerical_grad(func, a1), a1.grad)
+
+    # test tensor + tensor
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
+    a1, a2 = Tensor(a1_np), Tensor(a2_np)
+    res = fmax(a1, a2).sum()
+    res.backward()
+
+    func = lambda x: lambda y: sum(fmax(x, y))
+    assert_close(numerical_grad(func(a2), a1), a1.grad)
+    assert_close(numerical_grad(func(a1), a2), a2.grad)
+
+    # test with broadcast
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 1)
+    a1, a2 = Tensor(a1_np), Tensor(a2_np)
+    res = fmax(a1, a2).sum()
+    res.backward()
+
+    func = lambda x: lambda y: sum(fmax(x, y))
+    assert_close(numerical_grad(func(a2), a1), a1.grad)
+    assert_close(numerical_grad(func(a1), a2), a2.grad)
+    
+    
+def test_fmin():
+    # test tensor + scalar
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(1)
+    a1, a2 = Tensor(a1_np), Tensor(a2_np, requires_grad=False)
+    res = fmin(a1, a2).sum()
+    res.backward()
+
+    func = lambda x: sum(fmin(x, a2))
+    assert_close(numerical_grad(func, a1), a1.grad)
+
+    # test tensor + tensor
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
+    a1, a2 = Tensor(a1_np), Tensor(a2_np)
+    res = fmin(a1, a2).sum()
+    res.backward()
+
+    func = lambda x: lambda y: sum(fmin(x, y))
+    assert_close(numerical_grad(func(a2), a1), a1.grad)
+    assert_close(numerical_grad(func(a1), a2), a2.grad)
+
+    # test with broadcast
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 1)
+    a1, a2 = Tensor(a1_np), Tensor(a2_np)
+    res = fmin(a1, a2).sum()
+    res.backward()
+
+    func = lambda x: lambda y: sum(fmin(x, y))
+    assert_close(numerical_grad(func(a2), a1), a1.grad)
+    assert_close(numerical_grad(func(a1), a2), a2.grad)
+    
+
 def test_softmax():
     input_np = np.random.rand(3, 4)
     weight_np = np.random.rand(3, 4)

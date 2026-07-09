@@ -188,6 +188,12 @@ class Tensor(np.ndarray):
             res = Tensor(result_np, dep=Arccosh(*inputs))
         elif ufunc is np.arctanh:
             res = Tensor(result_np, dep=Arctanh(*inputs))
+        elif ufunc is np.fmax:
+            mask = inputs_np[0] > inputs_np[1]
+            res = Tensor(result_np, dep=Where(mask, *inputs))
+        elif ufunc is np.fmin:
+            mask = inputs_np[0] < inputs_np[1]
+            res = Tensor(result_np, dep=Where(mask, *inputs))
         else:
             return NotImplemented
 

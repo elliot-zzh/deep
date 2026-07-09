@@ -55,6 +55,10 @@ c = a > b
 c = a >= b
 c = a == b
 c = a != b
+c = da.fmax(a, b)             # IMPORTANT: here da.fmax is identical to da.maximum, for simplicity. same for da.fmin / da.minimum
+c = da.maximum(a, b)
+c = da.fmin(a, b)
+c = da.minimum(a, b)
 
 c = d & e                     # element-wise and
 c = d | e                     # element-wise or
