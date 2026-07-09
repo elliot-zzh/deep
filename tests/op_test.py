@@ -314,12 +314,10 @@ def test_logical_and():
     try_ufunc_call(np.logical_and, a1_np, a2_np)
 
     # logical and with broadcast
-    a1_np = np.array([[True, False, True], [False, True, False]])
     a2_np = np.array([[True], [False]])
     try_ufunc_call(np.logical_and, a1_np, a2_np)
 
     # logical and with scalar
-    a1_np = np.array([[True, False, True], [False, True, False]])
     a2_np = True
     try_ufunc_call(np.logical_and, a1_np, a2_np)
 
@@ -331,12 +329,10 @@ def test_logical_or():
     try_ufunc_call(np.logical_or, a1_np, a2_np)
 
     # logical or with broadcast
-    a1_np = np.array([[True, False, True], [False, True, False]])
     a2_np = np.array([[True], [False]])
     try_ufunc_call(np.logical_or, a1_np, a2_np)
 
     # logical or with scalar
-    a1_np = np.array([[True, False, True], [False, True, False]])
     a2_np = True
     try_ufunc_call(np.logical_or, a1_np, a2_np)
 
@@ -348,11 +344,21 @@ def test_logical_xor():
     try_ufunc_call(np.logical_xor, a1_np, a2_np)
 
     # logical xor with broadcast
-    a1_np = np.array([[True, False, True], [False, True, False]])
     a2_np = np.array([[True], [False]])
     try_ufunc_call(np.logical_xor, a1_np, a2_np)
 
     # logical xor with scalar
-    a1_np = np.array([[True, False, True], [False, True, False]])
     a2_np = True
     try_ufunc_call(np.logical_xor, a1_np, a2_np)
+    
+    
+def test_all():
+    # full reduction
+    input_np = np.array([[True, False, True], [False, True, False]])
+    input = Tensor(input_np)
+    res = all(input)
+    assert res.to_np() == np.all(input_np)
+    
+    # full along an axis
+    res = all(input, axis=-1)
+    assert (res.to_np() == np.all(input_np, axis=-1)).all()

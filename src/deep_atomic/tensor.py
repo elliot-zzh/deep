@@ -119,14 +119,10 @@ class Tensor(np.ndarray):
                 np.less,
                 np.less_equal,
                 np.logical_not,
-            )
-            or ufunc
-            in (
                 np.logical_and,
                 np.logical_or,
                 np.logical_xor,
             )
-            and method == "__call__"
             or not requires_grad
         ):
             return Tensor(result_np, requires_grad=False)
@@ -202,6 +198,12 @@ class Tensor(np.ndarray):
         if self.requires_grad:
             res.dep = Tile(self, reps)
         return res
+    
+    def all(self, axis=None):
+        return self.__array_ufunc__(np.logical_and, "reduce", self, axis=axis)
+    
+    def any(self, axis=None):
+        return self.__array_ufunc__(np.logical_or, "reduce", self, axis=axis)
 
 
 from .graph import *  # avoid looped dependencies

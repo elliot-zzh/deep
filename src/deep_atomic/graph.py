@@ -121,6 +121,7 @@ class Pow(TwoOp):
 class Sum(SingleOp):
     def __init__(self, input: Tensor, axis, keepdims):
         super().__init__(input)
+        # TODO: need to handle when axis is a tuple of int that means reducing mutiple dims at a time
         self.axis = axis
         self.keepdims = keepdims
 

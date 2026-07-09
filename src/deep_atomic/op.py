@@ -44,6 +44,12 @@ def log(input):
 def logical_not(input):
     return input.__array_ufunc(np.logical_not, "__call__", input)
 
+def all(input, axis=None):
+    return input.all(axis)
+
+def any(input, axis=None):
+    return input.any(axis)
+
 
 def sum(input: Tensor, axis=None, keepdims=False):
     return input.__array_ufunc__(np.add, "reduce", input, axis=axis, keepdims=keepdims)
