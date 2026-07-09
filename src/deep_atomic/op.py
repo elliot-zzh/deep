@@ -87,12 +87,14 @@ def argmin(input: Tensor, axis=-1, keepdims=False):
     )
 
 
-def softmax(input: Tensor, axis=-1):
+def softmax(input: Tensor, axis=-1, temperature=1):
+    input /= temperature
     input = exp(input - max(input, axis=axis, keepdims=True))
     return input / sum(input, axis=axis, keepdims=True)
 
 
-def log_softmax(input: Tensor, axis=-1):
+def log_softmax(input: Tensor, axis=-1, temperature=1):
+    input /= temperature
     input = input - max(input, axis=axis, keepdims=True)
     return input - log(sum(exp(input), axis=axis, keepdims=True))
 

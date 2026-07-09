@@ -306,13 +306,13 @@ def test_softmax():
     input = Tensor(input_np)
     weight = Tensor(weight_np)
     res = sum(
-        softmax(input, axis=-1) * weight
+        softmax(input, axis=-1, temperature=0.6) * weight
     )  # must multiply a weight so that res != 3
     res.backward()
 
-    func1 = lambda x: sum(softmax(x, axis=-1) * weight)
+    func1 = lambda x: sum(softmax(x, axis=-1, temperature=0.6) * weight)
     assert_close(numerical_grad(func1, input), input.grad)
-    func2 = lambda x: sum(softmax(input, axis=-1) * x)
+    func2 = lambda x: sum(softmax(input, axis=-1, temperature=0.6) * x)
     assert_close(numerical_grad(func2, weight), weight.grad)
 
 

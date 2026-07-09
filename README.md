@@ -45,16 +45,16 @@ c = da.sum(a, axis=1, keepdims=True)        # shape: (3, 1)
 # min, max, argmin, argmax follow the same signature
 
 # Softmax
-c = da.softmax(a, axis=-1)
-c = da.log_softmax(a, axis=-1)
+c = da.softmax(a, axis=-1, temperature=0.6) # support temperature. temperature=1 by default
+c = da.log_softmax(a, axis=-1, temperature=0.6)
 
 # Shape manipulations
 c = a.reshape(2, 6)
 c = a.reshape(1, 12).squeeze(0)               # shape: (12,)
-c = da.expand_dims(a, -1)                   # shape: (3, 4, 1)
+c = da.expand_dims(a, -1)                     # shape: (3, 4, 1)
 c = a.expand_dims(-1)                         # method‑style alternative
 c = a.repeat(2, axis=1)                       # shape: (3, 8)
-c = da.tile(a, (2, 2))                      # shape: (6, 8)
+c = da.tile(a, (2, 2))                        # shape: (6, 8)
 c = a.tile(2, 2)                              # method‑style alternative
 ```
 

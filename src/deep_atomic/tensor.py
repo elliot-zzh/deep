@@ -43,7 +43,9 @@ class Tensor(np.ndarray):
         if obj is None:
             return
         # FIXME: ? when creating a view, we cannot rely on python's default reference mechanism. must share identical depended_count across views. should depended_count be a list?
-        self.requires_grad = getattr(obj, "requires_grad", True)
+        self.requires_grad = getattr(
+            obj, "requires_grad", False
+        )  # requires_grad not exist means creating a view from a non-Tensor object
         self.dep = getattr(obj, "dep", None)
         self.depended_count = getattr(obj, "depended_cound", 0)
         self.grad = getattr(obj, "grad", None)
@@ -88,6 +90,22 @@ class Tensor(np.ndarray):
                 requires_grad = requires_grad or input_.requires_grad
             else:
                 inputs_np.append(input_)
+
+        if "out" in kwargs and kwargs["out"] is not None:
+            if not isinstance(kwargs["out"], tuple):
+                kwargs["out"] = (kwargs["out"],)
+            new_out = []
+            for i in kwargs["out"]:
+                # TODO: this will make kwargs['where'] ineffective when i is a tensor requiring grad! need to resolve this behavior
+                if isinstance(i, Tensor):
+                    if not i.requires_grad:
+                        new_out.append(i.to_np())
+                else:
+                    new_out.append(i)
+            if new_out:
+                kwargs["out"] = tuple(new_out)
+            else:
+                del kwargs["out"]
 
         result_np = super().__array_ufunc__(ufunc, method, *inputs_np, **kwargs)
 
