@@ -344,6 +344,16 @@ def test_silu():
 
     func = lambda x: sum(silu(x))
     assert_close(numerical_grad(func, input), input.grad)
+    
+    
+def test_silu():
+    input_np = np.random.rand(3, 4)
+    input = Tensor(input_np)
+    res = sum(relu(input))
+    res.backward()
+
+    func = lambda x: sum(relu(x))
+    assert_close(numerical_grad(func, input), input.grad)
 
 
 def test_reshape():

@@ -117,6 +117,11 @@ def sigmoid(input: Tensor):
     return res
 
 
+def relu(input: Tensor):
+    condition = input > 0
+    return where(condition, input, 0)
+
+
 def silu(input: Tensor):
     return input * sigmoid(input)
 

@@ -71,6 +71,7 @@ c = da.log_softmax(a, axis=-1, temperature=0.6)
 
 c = da.sigmoid(a)
 c = da.silu(a)
+c = da.relu(a)
 
 c = a.reshape(2, 6)
 c = a.reshape(1, 12).squeeze(0)               # shape: (12,)
