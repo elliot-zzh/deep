@@ -28,7 +28,6 @@ Most essential deep‑learning operations are implemented. For those that also e
 ```python
 a, b = da.Tensor(np.random.rand(3, 4)), da.Tensor(np.random.rand(3, 4))
 
-# Arithmetic & math
 c = a + b                     # addition
 c = a - b                     # subtraction
 c = a * b                     # element‑wise multiplication
@@ -38,17 +37,17 @@ c = a @ b                     # matrix multiplication
 c = da.exp(a)
 c = da.log(a)
 
-# Reductions
 c = da.sum(a)                               # shape: (1,)
 c = da.sum(a, axis=1)                       # shape: (3,)
 c = da.sum(a, axis=1, keepdims=True)        # shape: (3, 1)
 # min, max, argmin, argmax follow the same signature
 
-# Softmax
 c = da.softmax(a, axis=-1, temperature=0.6) # support temperature. temperature=1 by default
 c = da.log_softmax(a, axis=-1, temperature=0.6)
 
-# Shape manipulations
+c = da.sigmoid(a)
+c = da.silu(a)
+
 c = a.reshape(2, 6)
 c = a.reshape(1, 12).squeeze(0)               # shape: (12,)
 c = da.expand_dims(a, -1)                     # shape: (3, 4, 1)

@@ -99,6 +99,17 @@ def log_softmax(input: Tensor, axis=-1, temperature=1):
     return input - log(sum(exp(input), axis=axis, keepdims=True))
 
 
+def sigmoid(input: Tensor):
+    res = 1 / (1 + exp(-input))
+    if res.requires_grad:
+        res.dep = Sigmoid(input, res.to_np())
+    return res
+
+
+def silu(input: Tensor):
+    return input * sigmoid(input)
+
+
 def reshape(input: Tensor, target_shape):
     return input.reshape(*target_shape)
 

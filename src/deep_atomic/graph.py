@@ -97,6 +97,16 @@ class Log(SingleOp):
         self.input.backward(1 / self.input.to_np() * grad)
 
 
+class Sigmoid(SingleOp):
+    def __init__(self, input: Tensor, output_np: np.ndarray):
+        super().__init__(input)
+        self.output_np = output_np
+
+    def backward(self, grad):
+        # TODO: input's actual value is no longer useful during backward, and can be released to increase memory efficiency
+        self.input.backward(self.output_np * (1 - self.output_np) * grad)
+
+
 class Pow(TwoOp):
     def __init__(self, a1, a2):
         super().__init__(a1, a2)

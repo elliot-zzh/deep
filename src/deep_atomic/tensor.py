@@ -127,6 +127,8 @@ class Tensor(np.ndarray):
             res = Tensor(result_np, dep=Add(*inputs, sub=True))
         elif ufunc is np.multiply:
             res = Tensor(result_np, dep=Mul(*inputs))
+        elif ufunc is np.negative:
+            res = Tensor(result_np, dep=Div(-1, *inputs))
         elif ufunc is np.divide:
             res = Tensor(result_np, dep=Div(*inputs))
         elif ufunc is np.matmul:

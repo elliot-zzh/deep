@@ -326,6 +326,26 @@ def test_log_softmax():
     assert_close(numerical_grad(func, input), input.grad)
 
 
+def test_sigmoid():
+    input_np = np.random.rand(3, 4)
+    input = Tensor(input_np)
+    res = sum(sigmoid(input))
+    res.backward()
+
+    func = lambda x: sum(sigmoid(x))
+    assert_close(numerical_grad(func, input), input.grad)
+
+
+def test_silu():
+    input_np = np.random.rand(3, 4)
+    input = Tensor(input_np)
+    res = sum(silu(input))
+    res.backward()
+
+    func = lambda x: sum(silu(x))
+    assert_close(numerical_grad(func, input), input.grad)
+
+
 def test_reshape():
     input_np = np.random.rand(2, 6)
     input = Tensor(input_np)
