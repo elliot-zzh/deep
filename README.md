@@ -4,6 +4,15 @@ A simple deep learning framework built upon numpy only. Mainly for practice and 
 
 ## Usage
 
+### Installation
+
+```bash
+pip install deep-atomic
+
+# or using uv
+uv add deep-atomic
+```
+
 ### Import
 
 ```python
@@ -101,15 +110,6 @@ print(res.grad) # gradient get!
 - [ ] benchmark with pytorch on CPU
 - [ ] attention layers and full LLM training
 - [ ] finer type annotations, comments and documentation
-
-## Installation
-
-```bash
-pip install deep-atomic
-
-# or with uv
-uv add deep-atomic
-```
 
 ## Development
 
