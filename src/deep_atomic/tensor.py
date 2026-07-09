@@ -109,7 +109,26 @@ class Tensor(np.ndarray):
 
         result_np = super().__array_ufunc__(ufunc, method, *inputs_np, **kwargs)
 
-        if not requires_grad:
+        if (
+            ufunc
+            in (
+                np.equal,
+                np.not_equal,
+                np.greater,
+                np.greater_equal,
+                np.less,
+                np.less_equal,
+                np.logical_not,
+            )
+            or ufunc
+            in (
+                np.logical_and,
+                np.logical_or,
+                np.logical_xor,
+            )
+            and method == "__call__"
+            or not requires_grad
+        ):
             return Tensor(result_np, requires_grad=False)
 
         # if requires_grad, construct graph

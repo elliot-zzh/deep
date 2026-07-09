@@ -41,6 +41,10 @@ def log(input):
 # we do not implement exp2, log2, log10 etc. for that this framework is mainly for neural network training and for simplicity
 
 
+def logical_not(input):
+    return input.__array_ufunc(np.logical_not, "__call__", input)
+
+
 def sum(input: Tensor, axis=None, keepdims=False):
     return input.__array_ufunc__(np.add, "reduce", input, axis=axis, keepdims=keepdims)
 

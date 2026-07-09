@@ -36,6 +36,16 @@ c = a ** b                    # element‑wise power
 c = a @ b                     # matrix multiplication
 c = da.exp(a)
 c = da.log(a)
+c = a < b                     # element-wise comparison, create a boolean tensor
+c = a <= b
+c = a > b
+c = a >= b
+c = a == b
+c = a != b
+c = a & b                     # element-wise and
+c = a | b                     # element-wise or
+c = a ^ b                     # element-wise xor
+c = da.logical_not(a)         # element-wise not
 
 c = da.sum(a)                               # shape: (1,)
 c = da.sum(a, axis=1)                       # shape: (3,)

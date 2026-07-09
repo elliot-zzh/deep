@@ -201,3 +201,158 @@ def test_argmin():
     input = Tensor(input_np)
     res = argmin(input, axis=1)
     assert (res.to_np() == np.argmin(input_np, axis=1)).all()
+
+
+def test_equal():
+    # general eq
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
+    try_ufunc_call(np.equal, a1_np, a2_np)
+
+    # eq with broadcast
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(4)
+    try_ufunc_call(np.equal, a1_np, a2_np)
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 1)
+    try_ufunc_call(np.equal, a1_np, a2_np)
+
+    # eq with scalar
+    a1_np, a2_np = np.random.rand(3, 4), 5
+    try_ufunc_call(np.equal, a1_np, a2_np)
+
+
+def test_not_equal():
+    # general not equal
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
+    try_ufunc_call(np.not_equal, a1_np, a2_np)
+
+    # not equal with broadcast
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(4)
+    try_ufunc_call(np.not_equal, a1_np, a2_np)
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 1)
+    try_ufunc_call(np.not_equal, a1_np, a2_np)
+
+    # not equal with scalar
+    a1_np, a2_np = np.random.rand(3, 4), 5
+    try_ufunc_call(np.not_equal, a1_np, a2_np)
+
+
+def test_greater():
+    # general greater
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
+    try_ufunc_call(np.greater, a1_np, a2_np)
+
+    # greater with broadcast
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(4)
+    try_ufunc_call(np.greater, a1_np, a2_np)
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 1)
+    try_ufunc_call(np.greater, a1_np, a2_np)
+
+    # greater with scalar
+    a1_np, a2_np = np.random.rand(3, 4), 5
+    try_ufunc_call(np.greater, a1_np, a2_np)
+
+
+def test_greater_equal():
+    # general greater equal
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
+    try_ufunc_call(np.greater_equal, a1_np, a2_np)
+
+    # greater equal with broadcast
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(4)
+    try_ufunc_call(np.greater_equal, a1_np, a2_np)
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 1)
+    try_ufunc_call(np.greater_equal, a1_np, a2_np)
+
+    # greater equal with scalar
+    a1_np, a2_np = np.random.rand(3, 4), 5
+    try_ufunc_call(np.greater_equal, a1_np, a2_np)
+
+
+def test_less():
+    # general less
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
+    try_ufunc_call(np.less, a1_np, a2_np)
+
+    # less with broadcast
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(4)
+    try_ufunc_call(np.less, a1_np, a2_np)
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 1)
+    try_ufunc_call(np.less, a1_np, a2_np)
+
+    # less with scalar
+    a1_np, a2_np = np.random.rand(3, 4), 5
+    try_ufunc_call(np.less, a1_np, a2_np)
+
+
+def test_less_equal():
+    # general less equal
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
+    try_ufunc_call(np.less_equal, a1_np, a2_np)
+
+    # less equal with broadcast
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(4)
+    try_ufunc_call(np.less_equal, a1_np, a2_np)
+    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 1)
+    try_ufunc_call(np.less_equal, a1_np, a2_np)
+
+    # less equal with scalar
+    a1_np, a2_np = np.random.rand(3, 4), 5
+    try_ufunc_call(np.less_equal, a1_np, a2_np)
+
+
+def test_logical_not():
+    # general logical not
+    input_np = np.array([[True, False, True], [False, True, False]])
+    input = Tensor(input_np)
+    res = np.logical_not(input)
+    assert (res.to_np() == np.logical_not(input_np)).all()
+
+
+def test_logical_and():
+    # general logical and
+    a1_np = np.array([[True, False, True], [False, True, False]])
+    a2_np = np.array([[True, False, True], [False, True, False]])
+    try_ufunc_call(np.logical_and, a1_np, a2_np)
+
+    # logical and with broadcast
+    a1_np = np.array([[True, False, True], [False, True, False]])
+    a2_np = np.array([[True], [False]])
+    try_ufunc_call(np.logical_and, a1_np, a2_np)
+
+    # logical and with scalar
+    a1_np = np.array([[True, False, True], [False, True, False]])
+    a2_np = True
+    try_ufunc_call(np.logical_and, a1_np, a2_np)
+
+
+def test_logical_or():
+    # general logical or
+    a1_np = np.array([[True, False, True], [False, True, False]])
+    a2_np = np.array([[True, False, True], [False, True, False]])
+    try_ufunc_call(np.logical_or, a1_np, a2_np)
+
+    # logical or with broadcast
+    a1_np = np.array([[True, False, True], [False, True, False]])
+    a2_np = np.array([[True], [False]])
+    try_ufunc_call(np.logical_or, a1_np, a2_np)
+
+    # logical or with scalar
+    a1_np = np.array([[True, False, True], [False, True, False]])
+    a2_np = True
+    try_ufunc_call(np.logical_or, a1_np, a2_np)
+
+
+def test_logical_xor():
+    # general logical xor
+    a1_np = np.array([[True, False, True], [False, True, False]])
+    a2_np = np.array([[True, False, True], [False, True, False]])
+    try_ufunc_call(np.logical_xor, a1_np, a2_np)
+
+    # logical xor with broadcast
+    a1_np = np.array([[True, False, True], [False, True, False]])
+    a2_np = np.array([[True], [False]])
+    try_ufunc_call(np.logical_xor, a1_np, a2_np)
+
+    # logical xor with scalar
+    a1_np = np.array([[True, False, True], [False, True, False]])
+    a2_np = True
+    try_ufunc_call(np.logical_xor, a1_np, a2_np)
