@@ -1,5 +1,5 @@
-import pytest
 import numpy as np
+import pytest
 
 from deep_atomic import *
 
@@ -249,7 +249,6 @@ def test_max():
     res = max(input)
     assert res.to_np() == np.max(input_np)
 
-
     # test selective reduction
     res = max(input, axis=1)
     assert (res.to_np() == np.max(input_np, axis=1)).all()
@@ -280,8 +279,8 @@ def test_argmin():
     input = Tensor(input_np)
     res = argmin(input, axis=1)
     assert (res.to_np() == np.argmin(input_np, axis=1)).all()
-    
-    
+
+
 def test_fmax():
     # general add
     a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
@@ -296,8 +295,8 @@ def test_fmax():
     # add with scalar
     a1_np, a2_np = np.random.rand(3, 4), 0.5
     try_ufunc_call(np.fmax, a1_np, a2_np)
-    
-    
+
+
 def test_fmin():
     # general add
     a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
@@ -461,32 +460,41 @@ def test_logical_xor():
     # logical xor with scalar
     a2_np = True
     try_ufunc_call(np.logical_xor, a1_np, a2_np)
-    
-    
+
+
 def test_all():
     # full reduction
     input_np = np.array([[True, False, True], [False, True, False]])
     input = Tensor(input_np)
     res = all(input)
     assert res.to_np() == np.all(input_np)
-    
+
     # full along an axis
     res = all(input, axis=-1)
     assert (res.to_np() == np.all(input_np, axis=-1)).all()
 
+
 def test_topk():
     input = Tensor(np.array([[1, 2, 3], [6, 4, 5]]))
-    
+
     # largest
     expected_values = Tensor(np.array([[2, 3], [5, 6]]))
     expected_indices = Tensor(np.array([[1, 2], [2, 0]]))
     values, indices = topk(input, 2, axis=-1)
-    assert (np.sort(values.to_np(), axis=-1) == expected_values).all() # sort to ensure order
-    assert (np.take_along_axis(indices, np.argsort(values.to_np(), axis=-1), axis=-1) == expected_indices).all() # sort then gather to ensure correct mapping
-    
+    assert (
+        np.sort(values.to_np(), axis=-1) == expected_values
+    ).all()  # sort to ensure order
+    assert (
+        np.take_along_axis(indices, np.argsort(values.to_np(), axis=-1), axis=-1)
+        == expected_indices
+    ).all()  # sort then gather to ensure correct mapping
+
     # smallest
     expected_values = Tensor(np.array([[1, 2], [4, 5]]))
     expected_indices = Tensor(np.array([[0, 1], [1, 2]]))
     values, indices = topk(input, 2, axis=-1, largest=False)
     assert (np.sort(values.to_np(), axis=-1) == expected_values).all()
-    assert (np.take_along_axis(indices, np.argsort(values.to_np(), axis=-1), axis=-1) == expected_indices).all()
+    assert (
+        np.take_along_axis(indices, np.argsort(values.to_np(), axis=-1), axis=-1)
+        == expected_indices
+    ).all()

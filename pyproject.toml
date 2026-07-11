@@ -36,8 +36,13 @@ target-version = ['py38']
 
 [tool.ruff]
 line-length = 88
-lint.select = ["E", "F", "W", "I"]
+lint.select = ["I"] # currently only use isort
 lint.fixable = ["I"]
+
+[tool.ruff.lint.isort]
+known-third-party = ["numpy"]
+known-first-party = ["deep-atomic"]
+force-sort-within-sections = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

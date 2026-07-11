@@ -1,7 +1,8 @@
-import numpy as np
-from .tensor import Tensor
 from abc import ABC, abstractmethod
 
+import numpy as np
+
+from .tensor import Tensor
 from .utils import *
 
 
@@ -105,70 +106,74 @@ class Sigmoid(SingleOp):
     def backward(self, grad):
         # TODO: input's actual value is no longer useful during backward, and can be released to increase memory efficiency
         self.input.backward(self.output_np * (1 - self.output_np) * grad)
-        
-        
+
+
 class Sin(SingleOp):
     def __init__(self, input: Tensor):
         super().__init__(input)
-        
+
     def backward(self, grad):
         self.input.backward(np.cos(self.input.to_np()) * grad)
-        
+
 
 class Cos(SingleOp):
     def __init__(self, input: Tensor):
         super().__init__(input)
-        
+
     def backward(self, grad):
         self.input.backward(-np.sin(self.input.to_np()) * grad)
-        
-        
+
+
 class Tan(SingleOp):
     def __init__(self, input: Tensor, output_np: np.ndarray):
         super().__init__(input)
         self.output_np = output_np
-        
+
     def backward(self, grad):
-        self.input.backward((1 + self.output_np ** 2) * grad) # faster since only polynomials are concerned
-        
-        
+        self.input.backward(
+            (1 + self.output_np**2) * grad
+        )  # faster since only polynomials are concerned
+
+
 class Arcsin(SingleOp):
     def __init__(self, input: Tensor):
         super().__init__(input)
-        
+
     def backward(self, grad):
         self.input.backward(1 / (1 - self.input.to_np() ** 2) ** 0.5 * grad)
-        
-        
+
+
 class Arccos(SingleOp):
     def __init__(self, input: Tensor):
         super().__init__(input)
-        
+
     def backward(self, grad):
         self.input.backward(-1 / (1 - self.input.to_np() ** 2) ** 0.5 * grad)
-        
-        
+
+
 class Arctan(SingleOp):
     def __init__(self, input: Tensor):
         super().__init__(input)
-        
+
     def backward(self, grad):
         self.input.backward(1 / (self.input.to_np() ** 2 + 1) * grad)
-        
+
 
 class Sinh(SingleOp):
     def __init__(self, input: Tensor, output_np: np.ndarray):
         super().__init__(input)
         self.output_np = output_np
-        
+
     def backward(self, grad):
-        self.input.backward((1 + self.output_np ** 2) ** 0.5 * grad) # faster since only polynomials are concerned
-        
-        
+        self.input.backward(
+            (1 + self.output_np**2) ** 0.5 * grad
+        )  # faster since only polynomials are concerned
+
+
 class Cosh(SingleOp):
     def __init__(self, input: Tensor):
         super().__init__(input)
-        
+
     def backward(self, grad):
         self.input.backward(np.sinh(self.input.to_np()) * grad)
 
@@ -177,15 +182,17 @@ class Tanh(SingleOp):
     def __init__(self, input: Tensor, output_np: np.ndarray):
         super().__init__(input)
         self.output_np = output_np
-        
+
     def backward(self, grad):
-        self.input.backward((1 - self.output_np ** 2) * grad) # faster since only polynomials are concerned
-        
-        
+        self.input.backward(
+            (1 - self.output_np**2) * grad
+        )  # faster since only polynomials are concerned
+
+
 class Arcsinh(SingleOp):
     def __init__(self, input: Tensor):
         super().__init__(input)
-        
+
     def backward(self, grad):
         self.input.backward(1 / (self.input.to_np() ** 2 + 1) ** 0.5 * grad)
 
@@ -193,7 +200,7 @@ class Arcsinh(SingleOp):
 class Arccosh(SingleOp):
     def __init__(self, input: Tensor):
         super().__init__(input)
-        
+
     def backward(self, grad):
         self.input.backward(1 / (self.input.to_np() ** 2 - 1) ** 0.5 * grad)
 
@@ -201,7 +208,7 @@ class Arccosh(SingleOp):
 class Arctanh(SingleOp):
     def __init__(self, input: Tensor):
         super().__init__(input)
-        
+
     def backward(self, grad):
         self.input.backward(1 / (1 - self.input.to_np() ** 2) * grad)
 
@@ -355,6 +362,7 @@ class Tile(SingleOp):
             grad = grad.reshape(self.input.shape)
         self.input.backward(grad)
 
+
 # the condition is not differentiatable, so still two-operanded
 class Where(TwoOp):
     def __init__(self, condition, a1, a2):
@@ -362,19 +370,19 @@ class Where(TwoOp):
         if isinstance(condition, Tensor):
             condition = condition.to_np()
         self.condition = condition
-        
+
     def backward(self, grad):
         if self.a1 is not None:
             self.a1.backward(np.where(self.condition, grad, 0))
         if self.a2 is not None:
             self.a2.backward(np.where(self.condition, 0, grad))
-            
+
 
 class TakeAlongAxis(SingleOp):
     def __init__(self, input: Tensor, indices, axis):
         super().__init__(input)
         self.indices, self.axis = indices, axis
-        
+
     def backward(self, grad):
         grad_ = np.zeros(self.input.shape)
         np.put_along_axis(grad_, self.indices, grad, self.axis)

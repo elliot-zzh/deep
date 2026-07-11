@@ -1,6 +1,7 @@
 import numpy as np
-from .tensor import *
+
 from .graph import *
+from .tensor import *
 from .utils import *
 
 
@@ -43,8 +44,10 @@ def log(input):
 def logical_not(input):
     return input.__array_ufunc(np.logical_not, "__call__", input)
 
+
 def all(input, axis=None):
     return input.all(axis)
+
 
 def any(input, axis=None):
     return input.any(axis)
@@ -94,14 +97,15 @@ def argmin(input: Tensor, axis=-1, keepdims=False):
     return Tensor(
         np.argmin(input.to_np(), axis=axis, keepdims=keepdims), requires_grad=False
     )
-    
-    
+
+
 def fmax(a1, a2):
-    return a1.__array_ufunc__(np.fmax, '__call__', a1, a2)
+    return a1.__array_ufunc__(np.fmax, "__call__", a1, a2)
 
 
 def fmin(a1, a2):
-    return a1.__array_ufunc__(np.fmin, '__call__', a1, a2)
+    return a1.__array_ufunc__(np.fmin, "__call__", a1, a2)
+
 
 # unlike pytorch, fmax and maximum, fmin and minimum are the same since Deep Atomic currently doesn't handle NaN
 maximum = fmax
@@ -138,29 +142,38 @@ def cos(input):
 def tan(input):
     return input.__array_ufunc__(np.tan, "__call__", input)
 
+
 def arcsin(input):
     return input.__array_ufunc__(np.arcsin, "__call__", input)
+
 
 def arccos(input):
     return input.__array_ufunc__(np.arccos, "__call__", input)
 
+
 def arctan(input):
     return input.__array_ufunc__(np.arctan, "__call__", input)
+
 
 def sinh(input):
     return input.__array_ufunc__(np.sinh, "__call__", input)
 
+
 def cosh(input):
     return input.__array_ufunc__(np.cosh, "__call__", input)
+
 
 def tanh(input):
     return input.__array_ufunc__(np.tanh, "__call__", input)
 
+
 def arcsinh(input):
     return input.__array_ufunc__(np.arcsinh, "__call__", input)
 
+
 def arccosh(input):
     return input.__array_ufunc__(np.arccosh, "__call__", input)
+
 
 def arctanh(input):
     return input.__array_ufunc__(np.arctanh, "__call__", input)
@@ -176,7 +189,7 @@ def silu(input: Tensor):
 
 
 def gelu(input: Tensor):
-    return 0.5 * input * (1 + tanh(0.7978845608028654 * (input + 0.44715 * input ** 3)))
+    return 0.5 * input * (1 + tanh(0.7978845608028654 * (input + 0.44715 * input**3)))
 
 
 def reshape(input: Tensor, target_shape):
@@ -205,17 +218,25 @@ def where(condition, a1, a2):
         if isinstance(i, Tensor) and i.requires_grad:
             requires_grad = True
     res = Tensor(np.where(condition, a1, a2), requires_grad=requires_grad)
-    if res.requires_grad: res.dep = Where(condition, a1, a2)
+    if res.requires_grad:
+        res.dep = Where(condition, a1, a2)
     return res
+
 
 # TODO: API design. Should I follow pytorch and add a gather?
 def take_along_axis(input: Tensor, indices, axis=-1):
-    if isinstance(indices,Tensor): indices = indices.to_np() # cut off gradient
-    res = Tensor(np.take_along_axis(input, indices, axis), requires_grad=input.requires_grad)
-    if res.requires_grad: res.dep = TakeAlongAxis(input, indices, axis)
+    if isinstance(indices, Tensor):
+        indices = indices.to_np()  # cut off gradient
+    res = Tensor(
+        np.take_along_axis(input, indices, axis), requires_grad=input.requires_grad
+    )
+    if res.requires_grad:
+        res.dep = TakeAlongAxis(input, indices, axis)
     return res
 
+
 # TODO: Tensor.implement scatter_
+
 
 def topk(input: Tensor, kth, axis=-1, largest=True):
     if largest:

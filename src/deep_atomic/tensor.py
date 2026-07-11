@@ -228,10 +228,10 @@ class Tensor(np.ndarray):
         if self.requires_grad:
             res.dep = Tile(self, reps)
         return res
-    
+
     def all(self, axis=None):
         return self.__array_ufunc__(np.logical_and, "reduce", self, axis=axis)
-    
+
     def any(self, axis=None):
         return self.__array_ufunc__(np.logical_or, "reduce", self, axis=axis)
 

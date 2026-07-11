@@ -3,5 +3,5 @@
 __version__ = "0.2.0"
 __author__ = "elliot_zh@proton.me"
 
-from .tensor import *
 from .op import *
+from .tensor import *

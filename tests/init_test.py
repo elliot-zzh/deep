@@ -1,6 +1,7 @@
-import pytest
-from deep_atomic import *
 import numpy as np
+import pytest
+
+from deep_atomic import *
 
 
 def test_init():

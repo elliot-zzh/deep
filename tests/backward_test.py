@@ -1,11 +1,11 @@
-import pytest
 import logging
-import numpy as np
 
-from .utils import *
+import numpy as np
+import pytest
 
 from deep_atomic import *
 
+from .utils import *
 
 # TODO: refactor for more organized test code
 
@@ -449,8 +449,8 @@ def test_fmax():
     func = lambda x: lambda y: sum(fmax(x, y))
     assert_close(numerical_grad(func(a2), a1), a1.grad)
     assert_close(numerical_grad(func(a1), a2), a2.grad)
-    
-    
+
+
 def test_fmin():
     # test tensor + scalar
     a1_np, a2_np = np.random.rand(3, 4), np.random.rand(1)
@@ -480,7 +480,7 @@ def test_fmin():
     func = lambda x: lambda y: sum(fmin(x, y))
     assert_close(numerical_grad(func(a2), a1), a1.grad)
     assert_close(numerical_grad(func(a1), a2), a2.grad)
-    
+
 
 def test_softmax():
     input_np = np.random.rand(3, 4)
@@ -664,7 +664,7 @@ def test_where():
 
     assert_close(numerical_grad(func1, a1), a1.grad)
     assert_close(numerical_grad(func2, a2), a2.grad)
-    
+
 
 def test_topk():
     # largest
@@ -672,15 +672,15 @@ def test_topk():
     input = Tensor(input_np)
     res = sum(topk(input, 2, axis=-1)[0])
     res.backward()
-    
+
     func = lambda x: sum(topk(x, 2, axis=-1)[0])
     assert_close(numerical_grad(func, input), input.grad)
-    
+
     # smallest
     input_np = np.random.rand(4, 5)
     input = Tensor(input_np)
     res = sum(topk(input, 2, axis=-1, largest=False)[0])
     res.backward()
-    
+
     func = lambda x: sum(topk(x, 2, axis=-1, largest=False)[0])
     assert_close(numerical_grad(func, input), input.grad)
