@@ -2,6 +2,7 @@ from .tensor import *
 from .op import *
 import numpy as np
 from abc import ABC, abstractmethod
+import operator
 
 def init_param(*shape):
     return Tensor(np.random.randn(*shape))
@@ -132,9 +133,10 @@ class Module(ABC):
         for param in self.parameters():
             param.requires_grad = False
 
+# TODO: implement extra_repr for the modules?
 
 class ParameterList(Module):
-    def __init__(self, values: list[Tensor]):
+    def __init__(self, values):
         super().__init__()
         self._size = len(values)
         for idx, value in enumerate(values):
@@ -142,6 +144,9 @@ class ParameterList(Module):
     
     # TODO: edit implementation to make it same as any python list
     def _get_abs_index_string(self, idx: int):
+        idx = operator.index(idx)
+        if not (-len(self) <= idx <len(self)):
+            raise IndexError(f'index {idx} out of range')
         if idx < 0: idx += len(self)
         return str(idx)
 
@@ -160,11 +165,21 @@ class ParameterList(Module):
     def __iter__(self):
         return iter(self[i] for i in range(len(self)))
     
+    def append(self, value: Tensor):
+        new_idx = len(self)
+        self._size += 1
+        self[new_idx] = value
+        return self
+    
+    def extend(self, values):
+        for value in values:
+            self.append(value)
+        
     def forward(self): pass
     
     
 class ModuleList(Module):
-    def __init__(self, values: list[Module]):
+    def __init__(self, values):
         super().__init__()
         self._size = len(values)
         for idx, value in enumerate(values):
@@ -172,6 +187,9 @@ class ModuleList(Module):
     
     # TODO: edit implementation to make it same as any python list
     def _get_abs_index_string(self, idx: int):
+        idx = operator.index(idx)
+        if not (-len(self) <= idx <len(self)):
+            raise IndexError(f'index {idx} out of range')
         if idx < 0: idx += len(self)
         return str(idx)
 
@@ -189,10 +207,61 @@ class ModuleList(Module):
     def __iter__(self):
         return iter(self[i] for i in range(len(self)))
     
+    def append(self, value: Tensor):
+        new_idx = len(self)
+        self._size += 1
+        self[new_idx] = value
+        return self
+    
+    def extend(self, values):
+        for value in values:
+            self.append(value)
+    
     def forward(self): pass
 
+class BufferList(Module):
+    def __init__(self, values):
+        super().__init__()
+        self._size = len(values)
+        for idx, value in enumerate(values):
+            self[idx] = value
+    
+    # TODO: edit implementation to make it same as any python list
+    def _get_abs_index_string(self, idx: int):
+        idx = operator.index(idx)
+        if not (-len(self) <= idx <len(self)):
+            raise IndexError(f'index {idx} out of range')
+        if idx < 0: idx += len(self)
+        return str(idx)
 
-# TODO: implement BufferList, ParameterDict, BufferDict, ModuleDict
+    def __setitem__(self, idx: int, value: Tensor):
+        if not isinstance(value, Buffer): value = value.view(Buffer)
+        idx = self._get_abs_index_string(idx)
+        return setattr(self, idx, value)
+    
+    def __len__(self): return self._size
+    
+    def __getitem__(self, idx: int):
+        # TODO: support slice
+        idx = self._get_abs_index_string(idx)
+        return getattr(self, idx, None)
+    
+    def __iter__(self):
+        return iter(self[i] for i in range(len(self)))
+    
+    def append(self, value: Tensor):
+        new_idx = len(self)
+        self._size += 1
+        self[new_idx] = value
+        return self
+    
+    def extend(self, values):
+        for value in values:
+            self.append(value)
+        
+    def forward(self): pass
+    
+# TODO: implement ParameterDict, BufferDict, ModuleDict
 
 class Linear(Module):
     def __init__(self, in_features: int, out_features: int, bias=True):
