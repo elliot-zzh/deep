@@ -131,67 +131,68 @@ class Tensor(np.ndarray):
         # TODO: implement gradient computation for other methods / ufuncs
         from . import graph as g
 
-        if ufunc is np.add:
-            if method == "__call__":
-                res = Tensor(result_np, dep=g.Add(*inputs))
-            elif method == "reduce":
-                axis = kwargs.get("axis", None)
-                keepdims = kwargs.get("keepdims", False)
-                res = Tensor(result_np, dep=g.Sum(*inputs, axis, keepdims))
-            else:
+        match ufunc:
+            case np.add:
+                if method == "__call__":
+                    res = Tensor(result_np, dep=g.Add(*inputs))
+                elif method == "reduce":
+                    axis = kwargs.get("axis", None)
+                    keepdims = kwargs.get("keepdims", False)
+                    res = Tensor(result_np, dep=g.Sum(*inputs, axis, keepdims))
+                else:
+                    return NotImplemented
+            case np.subtract:
+                res = Tensor(result_np, dep=g.Add(*inputs, sub=True))
+            case np.multiply:
+                res = Tensor(result_np, dep=g.Mul(*inputs))
+            case np.negative:
+                res = Tensor(result_np, dep=g.Mul(-1, *inputs))
+            case np.divide:
+                res = Tensor(result_np, dep=g.Div(*inputs))
+            case np.matmul:
+                res = Tensor(result_np, dep=g.MatMul(*inputs))
+            case np.exp:
+                res = Tensor(result_np, dep=g.Exp(*inputs))
+            case np.log:
+                res = Tensor(result_np, dep=g.Log(*inputs))
+            case np.pow:
+                res = Tensor(result_np, dep=g.Pow(*inputs))
+            case np.square:
+                res = Tensor(result_np, dep=g.Pow(*inputs, 2))
+            case np.abs:
+                res = Tensor(result_np, dep=g.Abs(*inputs))
+            case np.sin:
+                res = Tensor(result_np, dep=g.Sin(*inputs))
+            case np.cos:
+                res = Tensor(result_np, dep=g.Cos(*inputs))
+            case np.tan:
+                res = Tensor(result_np, dep=g.Tan(*inputs, result_np))
+            case np.arcsin:
+                res = Tensor(result_np, dep=g.Arcsin(*inputs))
+            case np.arccos:
+                res = Tensor(result_np, dep=g.Arccos(*inputs))
+            case np.arctan:
+                res = Tensor(result_np, dep=g.Arctan(*inputs))
+            case np.sinh:
+                res = Tensor(result_np, dep=g.Sinh(*inputs, result_np))
+            case np.cosh:
+                res = Tensor(result_np, dep=g.Cosh(*inputs))
+            case np.tanh:
+                res = Tensor(result_np, dep=g.Tanh(*inputs, result_np))
+            case np.arcsinh:
+                res = Tensor(result_np, dep=g.Arcsinh(*inputs))
+            case np.arccosh:
+                res = Tensor(result_np, dep=g.Arccosh(*inputs))
+            case np.arctanh:
+                res = Tensor(result_np, dep=g.Arctanh(*inputs))
+            case np.fmax:
+                mask = inputs_np[0] > inputs_np[1]
+                res = Tensor(result_np, dep=g.Where(mask, *inputs))
+            case np.fmin:
+                mask = inputs_np[0] < inputs_np[1]
+                res = Tensor(result_np, dep=g.Where(mask, *inputs))
+            case _:
                 return NotImplemented
-        elif ufunc is np.subtract:
-            res = Tensor(result_np, dep=g.Add(*inputs, sub=True))
-        elif ufunc is np.multiply:
-            res = Tensor(result_np, dep=g.Mul(*inputs))
-        elif ufunc is np.negative:
-            res = Tensor(result_np, dep=g.Mul(-1, *inputs))
-        elif ufunc is np.divide:
-            res = Tensor(result_np, dep=g.Div(*inputs))
-        elif ufunc is np.matmul:
-            res = Tensor(result_np, dep=g.MatMul(*inputs))
-        elif ufunc is np.exp:
-            res = Tensor(result_np, dep=g.Exp(*inputs))
-        elif ufunc is np.log:
-            res = Tensor(result_np, dep=g.Log(*inputs))
-        elif ufunc is np.pow:
-            res = Tensor(result_np, dep=g.Pow(*inputs))
-        elif ufunc is np.square:
-            res = Tensor(result_np, dep=g.Pow(*inputs, 2))
-        elif ufunc is np.abs:
-            res = Tensor(result_np, dep=g.Abs(*inputs))
-        elif ufunc is np.sin:
-            res = Tensor(result_np, dep=g.Sin(*inputs))
-        elif ufunc is np.cos:
-            res = Tensor(result_np, dep=g.Cos(*inputs))
-        elif ufunc is np.tan:
-            res = Tensor(result_np, dep=g.Tan(*inputs, result_np))
-        elif ufunc is np.arcsin:
-            res = Tensor(result_np, dep=g.Arcsin(*inputs))
-        elif ufunc is np.arccos:
-            res = Tensor(result_np, dep=g.Arccos(*inputs))
-        elif ufunc is np.arctan:
-            res = Tensor(result_np, dep=g.Arctan(*inputs))
-        elif ufunc is np.sinh:
-            res = Tensor(result_np, dep=g.Sinh(*inputs, result_np))
-        elif ufunc is np.cosh:
-            res = Tensor(result_np, dep=g.Cosh(*inputs))
-        elif ufunc is np.tanh:
-            res = Tensor(result_np, dep=g.Tanh(*inputs, result_np))
-        elif ufunc is np.arcsinh:
-            res = Tensor(result_np, dep=g.Arcsinh(*inputs))
-        elif ufunc is np.arccosh:
-            res = Tensor(result_np, dep=g.Arccosh(*inputs))
-        elif ufunc is np.arctanh:
-            res = Tensor(result_np, dep=g.Arctanh(*inputs))
-        elif ufunc is np.fmax:
-            mask = inputs_np[0] > inputs_np[1]
-            res = Tensor(result_np, dep=g.Where(mask, *inputs))
-        elif ufunc is np.fmin:
-            mask = inputs_np[0] < inputs_np[1]
-            res = Tensor(result_np, dep=g.Where(mask, *inputs))
-        else:
-            return NotImplemented
 
         return res
 
