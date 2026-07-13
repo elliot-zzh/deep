@@ -56,6 +56,22 @@ def logical_xor(x1, x2):
     return x1.__array_ufunc__(np.logical_xor, "__call__", x1, x2)
 
 
+def bitwise_not(x):
+    return x.__array_ufunc__(np.bitwise_not, "__call__", x)
+
+
+def bitwise_and(x1, x2):
+    return x1.__array_ufunc__(np.bitwise_and, "__call__", x1, x2)
+
+
+def bitwise_or(x1, x2):
+    return x1.__array_ufunc__(np.bitwise_or, "__call__", x1, x2)
+
+
+def bitwise_xor(x1, x2):
+    return x1.__array_ufunc__(np.bitwise_xor, "__call__", x1, x2)
+
+
 def all(x, axis=None, keepdims=False):
     return x.all(axis, keepdims=keepdims)
 

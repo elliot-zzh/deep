@@ -122,6 +122,10 @@ class Tensor(np.ndarray):
                 np.logical_and,
                 np.logical_or,
                 np.logical_xor,
+                np.bitwise_and,
+                np.bitwise_or,
+                np.bitwise_xor,
+                np.bitwise_not,
             )
             or not requires_grad
         ):

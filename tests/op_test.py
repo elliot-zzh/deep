@@ -219,6 +219,9 @@ class TestLogical:
             (da.logical_and, np.logical_and),
             (da.logical_or, np.logical_or),
             (da.logical_xor, np.logical_xor),
+            lambda a, b: a | b,
+            lambda a, b: a & b,
+            lambda a, b: a ^ b,
         ],
     )
     @pytest.mark.parametrize("size1", [(3, 4)])
@@ -229,12 +232,21 @@ class TestLogical:
                 da.Tensor(rng.choice([True, False], size=size1)),
                 da.Tensor(rng.choice([True, False], size=size2)),
             )
-            _test_binary_forward(binary, *op)
+            if isinstance(op, tuple):
+                _test_binary_forward(binary, *op)
+            else:
+                _test_binary_forward(binary, op, op)
 
     class TestLogicalNot:
         def test_forward(self, rng):
             unary = da.Tensor(rng.choice([True, False], size=(3, 4)))
             _test_unary_forward(unary, da.logical_not, np.logical_not)
+
+    class TestBitwiseNot:
+        def test_forward(self, rng):
+            unary = da.Tensor(rng.choice([True, False], size=(3, 4)))
+            op = lambda x: ~x
+            _test_unary_forward(unary, op, op)
 
     @pytest.mark.parametrize("op", [(da.any, np.any), (da.all, np.all)])
     @pytest.mark.parametrize("axis", [0, 1])
