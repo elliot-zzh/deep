@@ -41,15 +41,27 @@ def log(input):
 
 
 def logical_not(input):
-    return input.__array_ufunc(np.logical_not, "__call__", input)
+    return input.__array_ufunc__(np.logical_not, "__call__", input)
 
 
-def all(input, axis=None):
-    return input.all(axis)
+def logical_and(t1, t2):
+    return t1.__array_ufunc__(np.logical_and, "__call__", t1, t2)
 
 
-def any(input, axis=None):
-    return input.any(axis)
+def logical_or(t1, t2):
+    return t1.__array_ufunc__(np.logical_or, "__call__", t1, t2)
+
+
+def logical_xor(t1, t2):
+    return t1.__array_ufunc__(np.logical_xor, "__call__", t1, t2)
+
+
+def all(input, axis=None, keepdims=False):
+    return input.all(axis, keepdims=keepdims)
+
+
+def any(input, axis=None, keepdims=False):
+    return input.any(axis, keepdims=keepdims)
 
 
 def sum(input: Tensor, axis=None, keepdims=False):

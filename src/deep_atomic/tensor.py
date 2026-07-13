@@ -236,8 +236,12 @@ class Tensor(np.ndarray):
             res.dep = Tile(self, reps)
         return res
 
-    def all(self, axis=None):
-        return self.__array_ufunc__(np.logical_and, "reduce", self, axis=axis)
+    def all(self, axis=None, keepdims=False):
+        return self.__array_ufunc__(
+            np.logical_and, "reduce", self, axis=axis, keepdims=keepdims
+        )
 
-    def any(self, axis=None):
-        return self.__array_ufunc__(np.logical_or, "reduce", self, axis=axis)
+    def any(self, axis=None, keepdims=False):
+        return self.__array_ufunc__(
+            np.logical_or, "reduce", self, axis=axis, keepdims=keepdims
+        )

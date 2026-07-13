@@ -60,13 +60,13 @@ c = da.maximum(a, b)
 c = da.fmin(a, b)
 c = da.minimum(a, b)
 
-c = d & e                     # element-wise and
-c = d | e                     # element-wise or
-c = d ^ e                     # element-wise xor
-c = da.logical_not(d)         # element-wise not
-c = d.all(axis=-1)            # reduction of and operation
-c = d.any(axis=-1)            # reduction of or operation
-c = da.where(d, a, b)         # return elements chosen from a or b depending on condition
+c = da.logical_and(d, e)                     # element-wise and
+c = da.logical_or(d, e)                      # element-wise or
+c = da.logical_xor(d, e)                     # element-wise xor
+c = da.logical_not(d)                        # element-wise not
+c = d.all(axis=-1, keepdims=False)           # reduction of and operation. axis=None, keepdims=False by default
+c = d.any(axis=-1, keepdims=False)           # reduction of or operation. axis=None, keepdims=False by default
+c = da.where(d, a, b)                        # return elements chosen from a or b depending on condition
 
 c = da.topk(a, 2, axis=-1, largest=True)    # same as pytorch. axis=-1, largest=True by default
 
@@ -74,6 +74,7 @@ c = da.sum(a)                               # shape: (1,)
 c = da.sum(a, axis=1)                       # shape: (3,)
 c = da.sum(a, axis=1, keepdims=True)        # shape: (3, 1)
 # min, max, argmin, argmax follow the same signature
+# all reductions set axis=None, keepdims=False by default
 
 c = da.softmax(a, axis=-1, temperature=0.6) # support temperature. temperature=1 by default
 c = da.log_softmax(a, axis=-1, temperature=0.6)

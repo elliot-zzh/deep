@@ -1,500 +1,384 @@
+import logging
+from tempfile import tempdir
+
 import numpy as np
 import pytest
 
 from deep_atomic import *
 
-
-def try_ufunc_call(ufunc, *args_np):
-    args = [Tensor(i) if isinstance(i, np.ndarray) else i for i in args_np]
-    res = ufunc(*args)
-    assert (res.to_np() == ufunc(*args_np)).all()
-
-
-def test_add():
-    # general add
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
-    try_ufunc_call(np.add, a1_np, a2_np)
-
-    # add with broadcast
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(4)
-    try_ufunc_call(np.add, a1_np, a2_np)
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 1)
-    try_ufunc_call(np.add, a1_np, a2_np)
-
-    # add with scalar
-    a1_np, a2_np = np.random.rand(3, 4), 5
-    try_ufunc_call(np.add, a1_np, a2_np)
-
-
-def test_sub():
-    # general sub
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
-    try_ufunc_call(np.subtract, a1_np, a2_np)
-
-    # sub with broadcast
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(4)
-    try_ufunc_call(np.subtract, a1_np, a2_np)
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 1)
-    try_ufunc_call(np.subtract, a1_np, a2_np)
-
-    # sub with scalar
-    a1_np, a2_np = np.random.rand(3, 4), 5
-    try_ufunc_call(np.subtract, a1_np, a2_np)
-
-
-def test_mul():
-    # general mul
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
-    try_ufunc_call(np.multiply, a1_np, a2_np)
-
-    # mul with broadcast
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(4)
-    try_ufunc_call(np.multiply, a1_np, a2_np)
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 1)
-    try_ufunc_call(np.multiply, a1_np, a2_np)
-
-    # mul with scalar
-    a1_np, a2_np = np.random.rand(3, 4), 5
-    try_ufunc_call(np.multiply, a1_np, a2_np)
-
-
-def test_matmul():
-    # general matmul
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(4, 5)
-    try_ufunc_call(np.matmul, a1_np, a2_np)
-
-    # matmul with broadcast
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(4)
-    try_ufunc_call(np.matmul, a1_np, a2_np)
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(4, 1)
-    try_ufunc_call(np.matmul, a1_np, a2_np)
-
-
-def test_div():
-    # general div
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
-    try_ufunc_call(np.divide, a1_np, a2_np)
-
-    # div with broadcast
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(4)
-    try_ufunc_call(np.divide, a1_np, a2_np)
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 1)
-    try_ufunc_call(np.divide, a1_np, a2_np)
-
-    # div with scalar
-    a1_np, a2_np = np.random.rand(3, 4), 5
-    try_ufunc_call(np.divide, a1_np, a2_np)
-
-
-def test_pow():
-    # general pow
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
-    try_ufunc_call(np.power, a1_np, a2_np)
-
-    # pow with broadcast
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(4)
-    try_ufunc_call(np.power, a1_np, a2_np)
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 1)
-    try_ufunc_call(np.power, a1_np, a2_np)
-
-    # pow with scalar
-    a1_np, a2_np = np.random.rand(3, 4), 5
-    try_ufunc_call(np.power, a1_np, a2_np)
-
-
-def test_exp():
-    input_np = np.random.rand(3, 4)
-    input = Tensor(input_np)
-    res = exp(input)
-    assert (res.to_np() == np.exp(input_np)).all()
-
-
-def test_log():
-    input_np = np.random.rand(3, 4)
-    input = Tensor(input_np)
-    res = log(input)
-    assert (res.to_np() == np.log(input_np)).all()
-
-
-def test_sin():
-    input_np = np.random.rand(3, 4) * 2 - 1
-    input = Tensor(input_np)
-    res = sin(input)
-    assert (res.to_np() == np.sin(input_np)).all()
-
-
-def test_cos():
-    input_np = np.random.rand(3, 4) * 2 - 1
-    input = Tensor(input_np)
-    res = cos(input)
-    assert (res.to_np() == np.cos(input_np)).all()
-
-
-def test_tan():
-    input_np = np.random.rand(3, 4) * 2 - 1
-    input = Tensor(input_np)
-    res = tan(input)
-    assert (res.to_np() == np.tan(input_np)).all()
-
-
-def test_arcsin():
-    input_np = np.clip(np.random.rand(3, 4) * 2 - 1, -0.99, 0.99)
-    input = Tensor(input_np)
-    res = arcsin(input)
-    assert (res.to_np() == np.arcsin(input_np)).all()
-
-
-def test_arccos():
-    input_np = np.clip(np.random.rand(3, 4) * 2 - 1, -0.99, 0.99)
-    input = Tensor(input_np)
-    res = arccos(input)
-    assert (res.to_np() == np.arccos(input_np)).all()
-
-
-def test_arctan():
-    input_np = np.random.rand(3, 4) * 10
-    input = Tensor(input_np)
-    res = arctan(input)
-    assert (res.to_np() == np.arctan(input_np)).all()
-
-
-def test_sinh():
-    input_np = np.random.rand(3, 4) * 2 - 1
-    input = Tensor(input_np)
-    res = sinh(input)
-    assert (res.to_np() == np.sinh(input_np)).all()
-
-
-def test_cosh():
-    input_np = np.random.rand(3, 4) * 2 - 1
-    input = Tensor(input_np)
-    res = cosh(input)
-    assert (res.to_np() == np.cosh(input_np)).all()
-
-
-def test_tanh():
-    input_np = np.random.rand(3, 4) * 2 - 1
-    input = Tensor(input_np)
-    res = tanh(input)
-    assert (res.to_np() == np.tanh(input_np)).all()
-
-
-def test_arcsinh():
-    input_np = np.random.rand(3, 4) * 10 - 5
-    input = Tensor(input_np)
-    res = arcsinh(input)
-    assert (res.to_np() == np.arcsinh(input_np)).all()
-
-
-def test_arccosh():
-    input_np = np.random.rand(3, 4) + 1.0
-    input = Tensor(input_np)
-    res = arccosh(input)
-    assert (res.to_np() == np.arccosh(input_np)).all()
-
-
-def test_arctanh():
-    input_np = np.clip(np.random.rand(3, 4) * 1.8 - 0.9, -0.99, 0.99)
-    input = Tensor(input_np)
-    res = arctanh(input)
-    assert (res.to_np() == np.arctanh(input_np)).all()
-
-
-def test_abs():
-    input_np = np.random.rand(3, 4) - 0.5
-    input = Tensor(input_np)
-    res = abs(input)
-    assert (res.to_np() == np.abs(input_np)).all()
-
-
-def test_reshape():
-    input_np = np.random.rand(2, 3, 4)
-    input = Tensor(input_np)
-    res = input.reshape(6, 4)
-    assert (res.to_np() == np.reshape(input_np, (6, 4))).all()
-
-
-def test_squeeze():
-    input_np = np.random.rand(1, 3, 1, 4, 1)
-    input = Tensor(input_np)
-    res = input.squeeze(axis=(0, 2, 4))
-    assert (res.to_np() == np.squeeze(input_np, axis=(0, 2, 4))).all()
-
-
-def test_expand_dims():
-    input_np = np.random.rand(3, 4)
-    input = Tensor(input_np)
-    res = input.expand_dims(axis=0)
-    assert (res.to_np() == np.expand_dims(input_np, axis=0)).all()
-
-
-def test_sum():
-    input_np = np.random.rand(3, 4)
-    input = Tensor(input_np)
-
-    # test full reduction
-    res = sum(input)
-    assert res.to_np() == np.sum(input_np)
-
-    # test selective reduction
-    res = sum(input, axis=1)
-    assert (res.to_np() == np.sum(input_np, axis=1)).all()
-
-
-def test_max():
-    input_np = np.random.rand(3, 4)
-    input = Tensor(input_np)
-
-    # test full reduction
-    res = max(input)
-    assert res.to_np() == np.max(input_np)
-
-    # test selective reduction
-    res = max(input, axis=1)
-    assert (res.to_np() == np.max(input_np, axis=1)).all()
-
-
-def test_min():
-    input_np = np.random.rand(3, 4)
-    input = Tensor(input_np)
-
-    # test full reduction
-    res = min(input)
-    assert res.to_np() == np.min(input_np)
-
-    # test selective reduction
-    res = min(input, axis=1)
-    assert (res.to_np() == np.min(input_np, axis=1)).all()
-
-
-def test_argmax():
-    input_np = np.random.rand(3, 4)
-    input = Tensor(input_np)
-    res = argmax(input, axis=1)
-    assert (res.to_np() == np.argmax(input_np, axis=1)).all()
-
-
-def test_argmin():
-    input_np = np.random.rand(3, 4)
-    input = Tensor(input_np)
-    res = argmin(input, axis=1)
-    assert (res.to_np() == np.argmin(input_np, axis=1)).all()
-
-
-def test_fmax():
-    # general add
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
-    try_ufunc_call(np.fmax, a1_np, a2_np)
-
-    # add with broadcast
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(4)
-    try_ufunc_call(np.fmax, a1_np, a2_np)
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 1)
-    try_ufunc_call(np.fmax, a1_np, a2_np)
-
-    # add with scalar
-    a1_np, a2_np = np.random.rand(3, 4), 0.5
-    try_ufunc_call(np.fmax, a1_np, a2_np)
-
-
-def test_fmin():
-    # general add
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
-    try_ufunc_call(np.fmin, a1_np, a2_np)
-
-    # add with broadcast
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(4)
-    try_ufunc_call(np.fmin, a1_np, a2_np)
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 1)
-    try_ufunc_call(np.fmin, a1_np, a2_np)
-
-    # add with scalar
-    a1_np, a2_np = np.random.rand(3, 4), 0.5
-    try_ufunc_call(np.fmin, a1_np, a2_np)
-
-
-def test_equal():
-    # general eq
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
-    try_ufunc_call(np.equal, a1_np, a2_np)
-
-    # eq with broadcast
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(4)
-    try_ufunc_call(np.equal, a1_np, a2_np)
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 1)
-    try_ufunc_call(np.equal, a1_np, a2_np)
-
-    # eq with scalar
-    a1_np, a2_np = np.random.rand(3, 4), 5
-    try_ufunc_call(np.equal, a1_np, a2_np)
-
-
-def test_not_equal():
-    # general not equal
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
-    try_ufunc_call(np.not_equal, a1_np, a2_np)
-
-    # not equal with broadcast
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(4)
-    try_ufunc_call(np.not_equal, a1_np, a2_np)
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 1)
-    try_ufunc_call(np.not_equal, a1_np, a2_np)
-
-    # not equal with scalar
-    a1_np, a2_np = np.random.rand(3, 4), 5
-    try_ufunc_call(np.not_equal, a1_np, a2_np)
-
-
-def test_greater():
-    # general greater
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
-    try_ufunc_call(np.greater, a1_np, a2_np)
-
-    # greater with broadcast
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(4)
-    try_ufunc_call(np.greater, a1_np, a2_np)
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 1)
-    try_ufunc_call(np.greater, a1_np, a2_np)
-
-    # greater with scalar
-    a1_np, a2_np = np.random.rand(3, 4), 5
-    try_ufunc_call(np.greater, a1_np, a2_np)
-
-
-def test_greater_equal():
-    # general greater equal
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
-    try_ufunc_call(np.greater_equal, a1_np, a2_np)
-
-    # greater equal with broadcast
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(4)
-    try_ufunc_call(np.greater_equal, a1_np, a2_np)
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 1)
-    try_ufunc_call(np.greater_equal, a1_np, a2_np)
-
-    # greater equal with scalar
-    a1_np, a2_np = np.random.rand(3, 4), 5
-    try_ufunc_call(np.greater_equal, a1_np, a2_np)
-
-
-def test_less():
-    # general less
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
-    try_ufunc_call(np.less, a1_np, a2_np)
-
-    # less with broadcast
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(4)
-    try_ufunc_call(np.less, a1_np, a2_np)
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 1)
-    try_ufunc_call(np.less, a1_np, a2_np)
-
-    # less with scalar
-    a1_np, a2_np = np.random.rand(3, 4), 5
-    try_ufunc_call(np.less, a1_np, a2_np)
-
-
-def test_less_equal():
-    # general less equal
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 4)
-    try_ufunc_call(np.less_equal, a1_np, a2_np)
-
-    # less equal with broadcast
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(4)
-    try_ufunc_call(np.less_equal, a1_np, a2_np)
-    a1_np, a2_np = np.random.rand(3, 4), np.random.rand(3, 1)
-    try_ufunc_call(np.less_equal, a1_np, a2_np)
-
-    # less equal with scalar
-    a1_np, a2_np = np.random.rand(3, 4), 5
-    try_ufunc_call(np.less_equal, a1_np, a2_np)
-
-
-def test_logical_not():
-    # general logical not
-    input_np = np.array([[True, False, True], [False, True, False]])
-    input = Tensor(input_np)
-    res = np.logical_not(input)
-    assert (res.to_np() == np.logical_not(input_np)).all()
-
-
-def test_logical_and():
-    # general logical and
-    a1_np = np.array([[True, False, True], [False, True, False]])
-    a2_np = np.array([[True, False, True], [False, True, False]])
-    try_ufunc_call(np.logical_and, a1_np, a2_np)
-
-    # logical and with broadcast
-    a2_np = np.array([[True], [False]])
-    try_ufunc_call(np.logical_and, a1_np, a2_np)
-
-    # logical and with scalar
-    a2_np = True
-    try_ufunc_call(np.logical_and, a1_np, a2_np)
-
-
-def test_logical_or():
-    # general logical or
-    a1_np = np.array([[True, False, True], [False, True, False]])
-    a2_np = np.array([[True, False, True], [False, True, False]])
-    try_ufunc_call(np.logical_or, a1_np, a2_np)
-
-    # logical or with broadcast
-    a2_np = np.array([[True], [False]])
-    try_ufunc_call(np.logical_or, a1_np, a2_np)
-
-    # logical or with scalar
-    a2_np = True
-    try_ufunc_call(np.logical_or, a1_np, a2_np)
-
-
-def test_logical_xor():
-    # general logical xor
-    a1_np = np.array([[True, False, True], [False, True, False]])
-    a2_np = np.array([[True, False, True], [False, True, False]])
-    try_ufunc_call(np.logical_xor, a1_np, a2_np)
-
-    # logical xor with broadcast
-    a2_np = np.array([[True], [False]])
-    try_ufunc_call(np.logical_xor, a1_np, a2_np)
-
-    # logical xor with scalar
-    a2_np = True
-    try_ufunc_call(np.logical_xor, a1_np, a2_np)
-
-
-def test_all():
-    # full reduction
-    input_np = np.array([[True, False, True], [False, True, False]])
-    input = Tensor(input_np)
-    res = all(input)
-    assert res.to_np() == np.all(input_np)
-
-    # full along an axis
-    res = all(input, axis=-1)
-    assert (res.to_np() == np.all(input_np, axis=-1)).all()
-
-
-def test_topk():
-    input = Tensor(np.array([[1, 2, 3], [6, 4, 5]]))
-
-    # largest
-    expected_values = Tensor(np.array([[2, 3], [5, 6]]))
-    expected_indices = Tensor(np.array([[1, 2], [2, 0]]))
-    values, indices = topk(input, 2, axis=-1)
-    assert (
-        np.sort(values.to_np(), axis=-1) == expected_values
-    ).all()  # sort to ensure order
-    assert (
-        np.take_along_axis(indices, np.argsort(values.to_np(), axis=-1), axis=-1)
-        == expected_indices
-    ).all()  # sort then gather to ensure correct mapping
-
-    # smallest
-    expected_values = Tensor(np.array([[1, 2], [4, 5]]))
-    expected_indices = Tensor(np.array([[0, 1], [1, 2]]))
-    values, indices = topk(input, 2, axis=-1, largest=False)
-    assert (np.sort(values.to_np(), axis=-1) == expected_values).all()
-    assert (
-        np.take_along_axis(indices, np.argsort(values.to_np(), axis=-1), axis=-1)
-        == expected_indices
-    ).all()
+from .utils import *
+
+
+def _test_unary_forward(init_fixture, op, op_expected, *args, **kwargs):
+    t = init_fixture
+    actual = op(t, *args, **kwargs)
+    expected = op_expected(t.to_np(), *args, **kwargs)
+    assert actual.shape == expected.shape
+    assert (actual == expected).all()
+
+
+def _test_binary_forward(init_fixture, op, op_expected, *args, **kwargs):
+    t1, t2 = init_fixture
+    actual = op(t1, t2, *args, **kwargs)
+    expected = op_expected(t1.to_np(), t2.to_np(), *args, **kwargs)
+    assert actual.shape == expected.shape
+    assert (actual == expected).all()
+
+
+def _test_unary_grad(init_fixture, op, *args, **kwargs):
+    t = init_fixture
+    res = op(t, *args, **kwargs).sum()
+    res.backward()
+
+    func = lambda x: op(x, *args, **kwargs).sum()
+
+    assert_close(numerical_grad(func, t), t.grad)
+
+
+def _test_binary_grad(init_fixture, op, *args, **kwargs):
+    t1, t2 = init_fixture
+    res = op(t1, t2, *args, **kwargs).sum()
+    res.backward()
+
+    func1 = lambda x: op(x, t2, *args, **kwargs).sum()
+    func2 = lambda x: op(t1, x, *args, **kwargs).sum()
+
+    assert_close(numerical_grad(func1, t1), t1.grad)
+    assert_close(numerical_grad(func2, t2), t2.grad)
+
+
+class TestArithmeticOps:
+    @pytest.mark.parametrize("size1", [(3, 4), (2, 3, 4)])
+    @pytest.mark.parametrize("size2", [(4, 5)])
+    class TestMatMul:
+        def test_forward(self, make_binary, size1, size2):
+            _test_binary_forward(
+                make_binary(size1=size1, size2=size2),
+                lambda a, b: a @ b,
+                lambda a, b: a @ b,
+            )
+
+        def test_grad(self, make_binary, size1, size2):
+            _test_binary_grad(make_binary(size1=size1, size2=size2), lambda a, b: a @ b)
+
+    @pytest.mark.parametrize("size1", [(3, 4)])
+    @pytest.mark.parametrize("size2", [(3, 4), (3, 1), (4,)])
+    class TestPow:
+        def test_forward(self, make_binary, size1, size2):
+            _test_binary_forward(
+                make_binary(
+                    low1=0.0, high1=3.0, low2=-3.0, high2=3.0, size1=size1, size2=size2
+                ),
+                lambda a, b: a**b,
+                lambda a, b: a**b,
+            )
+
+        def test_grad(self, make_binary, size1, size2):
+            _test_binary_grad(
+                make_binary(
+                    low1=0.0, high1=3.0, low2=-3.0, high2=3.0, size1=size1, size2=size2
+                ),
+                lambda a, b: a**b,
+            )
+
+    @pytest.mark.parametrize(
+        "op",
+        [
+            lambda a, b: a + b,
+            lambda a, b: a - b,
+            lambda a, b: a * b,
+            lambda a, b: a / b,
+        ],
+    )
+    @pytest.mark.parametrize("size1", [(3, 4)])
+    @pytest.mark.parametrize("size2", [(3, 4), (3, 1), (4,)])
+    class TestOthers:
+        def test_forward(self, make_binary, op, size1, size2):
+            _test_binary_forward(make_binary(size1=size1, size2=size2), op, op)
+
+        def test_grad(self, make_binary, op, size1, size2):
+            _test_binary_grad(make_binary(size1=size1, size2=size2), op)
+
+
+class TestUnaryMath:
+    @pytest.mark.parametrize(
+        "op",
+        [
+            (exp, np.exp),
+            (sin, np.sin),
+            (sin, np.sin),
+            (tan, np.tan),
+            (arctan, np.arctan),
+            (sinh, np.sinh),
+            (cosh, np.cosh),
+            (tanh, np.tanh),
+            (arcsinh, np.arcsinh),
+        ],
+    )
+    class TestDomainReal:
+        def test_forward(self, make_unary, op):
+            _test_unary_forward(make_unary(low=-5, high=5), *op)
+
+        def test_grad(self, make_unary, op):
+            _test_unary_grad(make_unary(low=-5, high=5), op[0])
+
+    @pytest.mark.parametrize(
+        "op", [(arcsin, np.arcsin), (arccos, np.arccos), (arctanh, np.arctanh)]
+    )
+    class TestDomainMinus1ToPlus1:
+        def test_forward(self, make_unary, op):
+            _test_unary_forward(make_unary(low=-1, high=1), *op)
+
+        def test_grad(self, make_unary, op):
+            _test_unary_grad(make_unary(low=-1, high=1), op[0])
+
+    class TestLog:
+        def test_forward(self, make_unary):
+            _test_unary_forward(make_unary(low=0, high=1e3), log, np.log)
+
+        def test_grad(self, make_unary):
+            _test_unary_grad(make_unary(low=0, high=1e3), log)
+
+    class TestArccosh:
+        def test_forward(self, make_unary):
+            _test_unary_forward(make_unary(low=1, high=1e3), arccosh, np.arccosh)
+
+        def test_grad(self, make_unary):
+            _test_unary_grad(make_unary(low=1, high=1e3), arccosh)
+
+
+# these are not basic operations so we do not test their forward passing
+# test their backward passing though, to test the correctness when deeper computational graph is concerned
+class TestActivations:
+    @pytest.mark.parametrize("op", [softmax, log_softmax])
+    @pytest.mark.parametrize("axis", [0, 1])
+    class TestSoftmax:
+        def test_grad(self, unary, op, axis):
+            _test_unary_grad(unary, op, axis=axis)
+
+    @pytest.mark.parametrize("op", [sigmoid, relu, silu, gelu])
+    class TestOthers:
+        def test_grad(self, unary, op):
+            _test_unary_grad(unary, op)
+
+
+class TestRecductions:
+    @pytest.mark.parametrize("op", [(sum, np.sum), (max, np.max), (min, np.min)])
+    @pytest.mark.parametrize("axis", [0, 1])
+    @pytest.mark.parametrize("keepdims", [True, False])
+    class TestWithGrad:
+        def test_forward(self, unary, op, axis, keepdims):
+            _test_unary_forward(unary, *op, axis=axis, keepdims=keepdims)
+
+        def test_grad(self, unary, op, axis, keepdims):
+            _test_unary_grad(unary, op[0], axis=axis, keepdims=keepdims)
+
+    @pytest.mark.parametrize("op", [(argmin, np.argmin), (argmax, np.argmax)])
+    @pytest.mark.parametrize("axis", [0, 1])
+    @pytest.mark.parametrize("keepdims", [True, False])
+    class TestWithoutGrad:
+        def test_forward(self, unary, op, axis, keepdims):
+            _test_unary_forward(unary, *op, axis=axis, keepdims=keepdims)
+
+
+class TestComparison:
+    @pytest.mark.parametrize(
+        "op",
+        [
+            lambda a, b: a == b,
+            lambda a, b: a < b,
+            lambda a, b: a <= b,
+            lambda a, b: a > b,
+            lambda a, b: a >= b,
+            lambda a, b: a != b,
+        ],
+    )
+    @pytest.mark.parametrize("size1", [(3, 4)])
+    @pytest.mark.parametrize("size2", [(3, 4), (3, 1), (4,)])
+    class TestResBool:
+        def test_forward(self, make_binary, op, size1, size2):
+            _test_binary_forward(make_binary(size1=size1, size2=size2), op, op)
+
+    @pytest.mark.parametrize("op", [(fmax, np.fmax), (fmin, np.fmin)])
+    @pytest.mark.parametrize("size1", [(3, 4)])
+    @pytest.mark.parametrize("size2", [(3, 4), (3, 1), (4,)])
+    class TestFMaxMin:
+        def test_forward(self, make_binary, op, size1, size2):
+            _test_binary_forward(make_binary(size1=size1, size2=size2), *op)
+
+        def test_grad(self, make_binary, op, size1, size2):
+            _test_binary_grad(make_binary(size1=size1, size2=size2), op[0])
+
+
+class TestLogical:
+    @pytest.mark.parametrize(
+        "op",
+        [
+            (logical_and, np.logical_and),
+            (logical_or, np.logical_or),
+            (logical_xor, np.logical_xor),
+        ],
+    )
+    @pytest.mark.parametrize("size1", [(3, 4)])
+    @pytest.mark.parametrize("size2", [(3, 4), (3, 1), (4,)])
+    class TestBinary:
+        def test_forward(self, rng, op, size1, size2):
+            binary = (
+                Tensor(rng.choice([True, False], size=size1)),
+                Tensor(rng.choice([True, False], size=size2)),
+            )
+            _test_binary_forward(binary, *op)
+
+    class TestLogicalNot:
+        def test_forward(self, rng):
+            unary = Tensor(rng.choice([True, False], size=(3, 4)))
+            _test_unary_forward(unary, logical_not, np.logical_not)
+
+    @pytest.mark.parametrize("op", [(any, np.any), (all, np.all)])
+    @pytest.mark.parametrize("axis", [0, 1])
+    @pytest.mark.parametrize("keepdims", [True, False])
+    class TestReductions:
+        def test_forward(self, rng, op, axis, keepdims):
+            unary = Tensor(rng.choice([True, False], size=(3, 4)))
+            _test_unary_forward(unary, *op, axis=axis, keepdims=keepdims)
+
+
+class TestShapeOps:
+    @pytest.mark.parametrize("axis", [0, 1, 2])
+    class TestExpandDims:
+        def test_forward(self, unary, axis):
+            _test_unary_forward(unary, expand_dims, np.expand_dims, axis=axis)
+
+        def test_grad(self, unary, axis):
+            _test_unary_grad(unary, expand_dims, axis=axis)
+
+    @pytest.mark.parametrize("size", [(3, 4, 1), (3, 1, 4)])
+    class TestSqueeze:
+        def test_forward(self, make_unary, size):
+            t = make_unary(size=size)
+            axis = 0
+            for i, v in enumerate(t.shape):
+                if v == 1:
+                    axis = i
+            _test_unary_forward(t, squeeze, np.squeeze, axis=axis)
+
+        def test_grad(self, make_unary, size):
+            t = make_unary(size=size)
+            axis = 0
+            for i, v in enumerate(t.shape):
+                if v == 1:
+                    axis = i
+            _test_unary_grad(t, squeeze, axis=axis)
+
+    @pytest.mark.parametrize(
+        "repeats_axis",
+        [
+            (2, None),
+            (2, 0),
+            ([1, 2, 3] * 4, None),
+            ([1, 2, 3], 0),
+        ],
+    )
+    class TestRepeat:
+        def test_forward(self, unary, repeats_axis):
+            repeats, axis = repeats_axis
+            _test_unary_forward(unary, repeat, np.repeat, repeats=repeats, axis=axis)
+
+        def test_grad(self, unary, repeats_axis):
+            repeats, axis = repeats_axis
+            log_softmax_axis = -1 if axis is None else axis
+            _test_unary_grad(
+                unary,
+                lambda x: log_softmax(
+                    x.repeat(repeats, axis=axis), axis=log_softmax_axis
+                ),
+            )
+
+    @pytest.mark.parametrize("reps", [(3,), (2, 3), (2, 2, 3)])
+    class TestTile:
+        def test_forward(self, unary, reps):
+            _test_unary_forward(unary, tile, np.tile, reps=reps)
+
+        def test_grad(self, unary, reps):
+            # use more complex test to deepen the graph
+            _test_unary_grad(unary, lambda a: log_softmax(a.tile(*reps)))
+
+    @pytest.mark.parametrize("size1", [(3, 4), (2, 3, 4)])
+    class TestWhere:
+        def test_forward(self, rng, make_binary, size1):
+            t1, _ = make_binary(size1=size1)
+            condition = Tensor(rng.choice([True, False], size=t1.shape))
+            _test_binary_forward(
+                make_binary(size1=size1),
+                lambda a, b: where(condition, a, b),
+                lambda a, b: np.where(condition.to_np(), a, b),
+            )
+
+        def test_grad(self, rng, make_binary, size1):
+            t1, _ = make_binary(size1=size1)
+            condition = Tensor(rng.choice([True, False], size=t1.shape))
+            _test_binary_grad(
+                make_binary(size1=size1),
+                lambda a, b: where(condition, a, b),
+            )
+
+    @pytest.mark.parametrize("target_shape", [(2, 6), (3, 2, 2)])
+    class TestReshape:
+        def test_forward(self, unary, target_shape):
+            _test_unary_forward(
+                unary,
+                lambda x: reshape(x, target_shape=target_shape),
+                lambda x: np.reshape(x, shape=target_shape),
+            )
+
+        def test_grad(self, unary, target_shape):
+            # use more complex test to deepen the graph
+            _test_unary_grad(
+                unary, lambda x: log_softmax(x.reshape(target_shape), axis=-1)
+            )
+
+
+class TestSelection:
+    class TestTopk:
+        class test_forward:
+            # numpy does not have direct equivalence to topk
+            # and given topk's complexity, we hardwired this test
+            def test_largest(self):
+                t = Tensor(np.array([[1, 2, 3], [6, 4, 5]]))
+
+                # largest
+                expected_values = Tensor(np.array([[2, 3], [5, 6]]))
+                expected_indices = Tensor(np.array([[1, 2], [2, 0]]))
+                values, indices = topk(t, 2, axis=-1)
+                assert (
+                    np.sort(values.to_np(), axis=-1) == expected_values
+                ).all()  # sort to ensure order
+                assert (
+                    np.take_along_axis(
+                        indices, np.argsort(values.to_np(), axis=-1), axis=-1
+                    )
+                    == expected_indices
+                ).all()  # sort then gather to ensure correct mapping
+
+            def test_smallest(self):
+                t = Tensor(np.array([[1, 2, 3], [6, 4, 5]]))
+
+                # smallest
+                expected_values = Tensor(np.array([[1, 2], [4, 5]]))
+                expected_indices = Tensor(np.array([[0, 1], [1, 2]]))
+                values, indices = topk(t, 2, axis=-1, largest=False)
+                assert (np.sort(values.to_np(), axis=-1) == expected_values).all()
+                assert (
+                    np.take_along_axis(
+                        indices, np.argsort(values.to_np(), axis=-1), axis=-1
+                    )
+                    == expected_indices
+                ).all()
+
+        @pytest.mark.parametrize("axis", [0, 1])
+        @pytest.mark.parametrize("kth", [1, 2])
+        @pytest.mark.parametrize("largest", [True, False])
+        def test_grad(self, unary, axis, kth, largest):
+            _test_unary_grad(
+                unary, lambda x: topk(x, axis=axis, kth=kth, largest=largest)[0]
+            )
