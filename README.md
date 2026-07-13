@@ -61,9 +61,13 @@ c = da.fmin(a, b)
 c = da.minimum(a, b)
 
 c = da.logical_and(d, e)                     # element-wise and
+c = d & e                                    # equivalence
 c = da.logical_or(d, e)                      # element-wise or
+c = d | e
 c = da.logical_xor(d, e)                     # element-wise xor
+c = d ^ e
 c = da.logical_not(d)                        # element-wise not
+c = ~d
 c = d.all(axis=-1, keepdims=False)           # reduction of and operation. axis=None, keepdims=False by default
 c = d.any(axis=-1, keepdims=False)           # reduction of or operation. axis=None, keepdims=False by default
 c = da.where(d, a, b)                        # return elements chosen from a or b depending on condition
