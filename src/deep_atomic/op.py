@@ -5,28 +5,28 @@ from .tensor import *
 from .utils import *
 
 
-def add(a1, a2):
-    return a1.__array_ufunc__(np.add, "__call__", a1, a2)
+def add(x1, x2):
+    return x1.__array_ufunc__(np.add, "__call__", x1, x2)
 
 
-def sub(a1, a2):
-    return a1.__array_ufunc__(np.subtract, "__call__", a1, a2)
+def sub(x1, x2):
+    return x1.__array_ufunc__(np.subtract, "__call__", x1, x2)
 
 
-def mul(a1, a2):
-    return a1.__array_ufunc__(np.multiply, "__call__", a1, a2)
+def mul(x1, x2):
+    return x1.__array_ufunc__(np.multiply, "__call__", x1, x2)
 
 
-def div(a1, a2):
-    return a1.__array_ufunc__(np.divide, "__call__", a1, a2)
+def div(x1, x2):
+    return x1.__array_ufunc__(np.divide, "__call__", x1, x2)
 
 
-def matmul(a1, a2):
-    return a1.__array_ufunc__(np.matmul, "__call__", a1, a2)
+def matmul(x1, x2):
+    return x1.__array_ufunc__(np.matmul, "__call__", x1, x2)
 
 
-def pow(a1, a2):
-    return a1.__array_ufunc__(np.pow, "__call__", a1, a2)
+def pow(x1, x2):
+    return x1.__array_ufunc__(np.pow, "__call__", x1, x2)
 
 
 def exp(x):
@@ -106,12 +106,12 @@ def argmin(x: Tensor, axis=-1, keepdims=False):
     )
 
 
-def fmax(a1, a2):
-    return a1.__array_ufunc__(np.fmax, "__call__", a1, a2)
+def fmax(x1, x2):
+    return x1.__array_ufunc__(np.fmax, "__call__", x1, x2)
 
 
-def fmin(a1, a2):
-    return a1.__array_ufunc__(np.fmin, "__call__", a1, a2)
+def fmin(x1, x2):
+    return x1.__array_ufunc__(np.fmin, "__call__", x1, x2)
 
 
 # unlike pytorch, fmax and maximum, fmin and minimum are the same since Deep Atomic currently doesn't handle NaN
@@ -219,14 +219,14 @@ def tile(x: Tensor, reps):
     return x.tile(*reps)
 
 
-def where(condition, a1, a2):
+def where(condition, x1, x2):
     requires_grad = False
-    for i in (a1, a2):
+    for i in (x1, x2):
         if isinstance(i, Tensor) and i.requires_grad:
             requires_grad = True
-    res = Tensor(np.where(condition, a1, a2), requires_grad=requires_grad)
+    res = Tensor(np.where(condition, x1, x2), requires_grad=requires_grad)
     if res.requires_grad:
-        res.dep = Where(condition, a1, a2)
+        res.dep = Where(condition, x1, x2)
     return res
 
 
