@@ -29,84 +29,80 @@ def pow(a1, a2):
     return a1.__array_ufunc__(np.pow, "__call__", a1, a2)
 
 
-def exp(input):
-    return input.__array_ufunc__(np.exp, "__call__", input)
+def exp(x):
+    return x.__array_ufunc__(np.exp, "__call__", x)
 
 
-def log(input):
-    return input.__array_ufunc__(np.log, "__call__", input)
+def log(x):
+    return x.__array_ufunc__(np.log, "__call__", x)
 
 
 # we do not implement exp2, log2, log10 etc. for that this framework is mainly for neural network training and for simplicity
 
 
-def logical_not(input):
-    return input.__array_ufunc__(np.logical_not, "__call__", input)
+def logical_not(x):
+    return x.__array_ufunc__(np.logical_not, "__call__", x)
 
 
-def logical_and(t1, t2):
-    return t1.__array_ufunc__(np.logical_and, "__call__", t1, t2)
+def logical_and(x1, x2):
+    return x1.__array_ufunc__(np.logical_and, "__call__", x1, x2)
 
 
-def logical_or(t1, t2):
-    return t1.__array_ufunc__(np.logical_or, "__call__", t1, t2)
+def logical_or(x1, x2):
+    return x1.__array_ufunc__(np.logical_or, "__call__", x1, x2)
 
 
-def logical_xor(t1, t2):
-    return t1.__array_ufunc__(np.logical_xor, "__call__", t1, t2)
+def logical_xor(x1, x2):
+    return x1.__array_ufunc__(np.logical_xor, "__call__", x1, x2)
 
 
-def all(input, axis=None, keepdims=False):
-    return input.all(axis, keepdims=keepdims)
+def all(x, axis=None, keepdims=False):
+    return x.all(axis, keepdims=keepdims)
 
 
-def any(input, axis=None, keepdims=False):
-    return input.any(axis, keepdims=keepdims)
+def any(x, axis=None, keepdims=False):
+    return x.any(axis, keepdims=keepdims)
 
 
-def sum(input: Tensor, axis=None, keepdims=False):
-    return input.__array_ufunc__(np.add, "reduce", input, axis=axis, keepdims=keepdims)
+def sum(x: Tensor, axis=None, keepdims=False):
+    return x.__array_ufunc__(np.add, "reduce", x, axis=axis, keepdims=keepdims)
 
 
-def max(input: Tensor, axis=None, keepdims=False):
-    res = Tensor(
-        np.max(input.to_np(), axis=axis, keepdims=keepdims), requires_grad=False
-    )
-    if input.requires_grad:
+def max(x: Tensor, axis=None, keepdims=False):
+    res = Tensor(np.max(x.to_np(), axis=axis, keepdims=keepdims), requires_grad=False)
+    if x.requires_grad:
         res.requires_grad = True
         if axis == None:
-            res.dep = MinMax(input, None, keepdims, full_red_value=res.to_np())
+            res.dep = MinMax(x, None, keepdims, full_red_value=res.to_np())
         else:
-            indices = np.argmax(input.to_np(), axis=axis, keepdims=True)
-            res.dep = MinMax(input, axis, keepdims, indices=indices)
+            indices = np.argmax(x.to_np(), axis=axis, keepdims=True)
+            res.dep = MinMax(x, axis, keepdims, indices=indices)
     return res
 
 
-def min(input: Tensor, axis=None, keepdims=False):
-    res = Tensor(
-        np.min(input.to_np(), axis=axis, keepdims=keepdims), requires_grad=False
-    )
-    if input.requires_grad:
+def min(x: Tensor, axis=None, keepdims=False):
+    res = Tensor(np.min(x.to_np(), axis=axis, keepdims=keepdims), requires_grad=False)
+    if x.requires_grad:
         res.requires_grad = True
         if axis == None:
-            res.dep = MinMax(input, None, keepdims, full_red_value=res.to_np())
+            res.dep = MinMax(x, None, keepdims, full_red_value=res.to_np())
         else:
-            indices = np.argmin(input.to_np(), axis=axis, keepdims=True)
-            res.dep = MinMax(input, axis, keepdims, indices=indices)
+            indices = np.argmin(x.to_np(), axis=axis, keepdims=True)
+            res.dep = MinMax(x, axis, keepdims, indices=indices)
     return res
 
 
-def argmax(input: Tensor, axis=-1, keepdims=False):
+def argmax(x: Tensor, axis=-1, keepdims=False):
     # no gradient concerned when performing argmax
     return Tensor(
-        np.argmax(input.to_np(), axis=axis, keepdims=keepdims), requires_grad=False
+        np.argmax(x.to_np(), axis=axis, keepdims=keepdims), requires_grad=False
     )
 
 
-def argmin(input: Tensor, axis=-1, keepdims=False):
+def argmin(x: Tensor, axis=-1, keepdims=False):
     # no gradient concerned when performing armin
     return Tensor(
-        np.argmin(input.to_np(), axis=axis, keepdims=keepdims), requires_grad=False
+        np.argmin(x.to_np(), axis=axis, keepdims=keepdims), requires_grad=False
     )
 
 
@@ -123,104 +119,104 @@ maximum = fmax
 minimum = fmin
 
 
-def softmax(input: Tensor, axis=-1, temperature=1):
-    input /= temperature
-    input = exp(input - max(input, axis=axis, keepdims=True))
-    return input / sum(input, axis=axis, keepdims=True)
+def softmax(x: Tensor, axis=-1, temperature=1):
+    x /= temperature
+    x = exp(x - max(x, axis=axis, keepdims=True))
+    return x / sum(x, axis=axis, keepdims=True)
 
 
-def log_softmax(input: Tensor, axis=-1, temperature=1):
-    input /= temperature
-    input = input - max(input, axis=axis, keepdims=True)
-    return input - log(sum(exp(input), axis=axis, keepdims=True))
+def log_softmax(x: Tensor, axis=-1, temperature=1):
+    x /= temperature
+    x = x - max(x, axis=axis, keepdims=True)
+    return x - log(sum(exp(x), axis=axis, keepdims=True))
 
 
-def sigmoid(input: Tensor):
-    res = 1 / (1 + exp(-input))
+def sigmoid(x: Tensor):
+    res = 1 / (1 + exp(-x))
     if res.requires_grad:
-        res.dep = Sigmoid(input, res.to_np())
+        res.dep = Sigmoid(x, res.to_np())
     return res
 
 
-def sin(input):
-    return input.__array_ufunc__(np.sin, "__call__", input)
+def sin(x):
+    return x.__array_ufunc__(np.sin, "__call__", x)
 
 
-def cos(input):
-    return input.__array_ufunc__(np.cos, "__call__", input)
+def cos(x):
+    return x.__array_ufunc__(np.cos, "__call__", x)
 
 
-def tan(input):
-    return input.__array_ufunc__(np.tan, "__call__", input)
+def tan(x):
+    return x.__array_ufunc__(np.tan, "__call__", x)
 
 
-def arcsin(input):
-    return input.__array_ufunc__(np.arcsin, "__call__", input)
+def arcsin(x):
+    return x.__array_ufunc__(np.arcsin, "__call__", x)
 
 
-def arccos(input):
-    return input.__array_ufunc__(np.arccos, "__call__", input)
+def arccos(x):
+    return x.__array_ufunc__(np.arccos, "__call__", x)
 
 
-def arctan(input):
-    return input.__array_ufunc__(np.arctan, "__call__", input)
+def arctan(x):
+    return x.__array_ufunc__(np.arctan, "__call__", x)
 
 
-def sinh(input):
-    return input.__array_ufunc__(np.sinh, "__call__", input)
+def sinh(x):
+    return x.__array_ufunc__(np.sinh, "__call__", x)
 
 
-def cosh(input):
-    return input.__array_ufunc__(np.cosh, "__call__", input)
+def cosh(x):
+    return x.__array_ufunc__(np.cosh, "__call__", x)
 
 
-def tanh(input):
-    return input.__array_ufunc__(np.tanh, "__call__", input)
+def tanh(x):
+    return x.__array_ufunc__(np.tanh, "__call__", x)
 
 
-def arcsinh(input):
-    return input.__array_ufunc__(np.arcsinh, "__call__", input)
+def arcsinh(x):
+    return x.__array_ufunc__(np.arcsinh, "__call__", x)
 
 
-def arccosh(input):
-    return input.__array_ufunc__(np.arccosh, "__call__", input)
+def arccosh(x):
+    return x.__array_ufunc__(np.arccosh, "__call__", x)
 
 
-def arctanh(input):
-    return input.__array_ufunc__(np.arctanh, "__call__", input)
+def arctanh(x):
+    return x.__array_ufunc__(np.arctanh, "__call__", x)
 
 
-def relu(input: Tensor):
-    condition = input > 0
-    return where(condition, input, 0)
+def relu(x: Tensor):
+    condition = x > 0
+    return where(condition, x, 0)
 
 
-def silu(input: Tensor):
-    return input * sigmoid(input)
+def silu(x: Tensor):
+    return x * sigmoid(x)
 
 
-def gelu(input: Tensor):
-    return 0.5 * input * (1 + tanh(0.7978845608028654 * (input + 0.44715 * input**3)))
+def gelu(x: Tensor):
+    return 0.5 * x * (1 + tanh(0.7978845608028654 * (x + 0.44715 * x**3)))
 
 
-def reshape(input: Tensor, target_shape):
-    return input.reshape(*target_shape)
+def reshape(x: Tensor, target_shape):
+    return x.reshape(*target_shape)
 
 
-def squeeze(input: Tensor, axis):
-    return input.squeeze(axis)
+def squeeze(x: Tensor, axis):
+    return x.squeeze(axis)
 
 
-def expand_dims(input: Tensor, axis):
-    return input.expand_dims(axis)
+def expand_dims(x: Tensor, axis):
+    return x.expand_dims(axis)
 
 
-def repeat(input: Tensor, repeats, axis=None):
-    return input.repeat(repeats, axis)
+def repeat(x: Tensor, repeats, axis=None):
+    return x.repeat(repeats, axis)
 
 
-def tile(input: Tensor, reps):
-    return input.tile(*reps)
+def tile(x: Tensor, reps):
+    return x.tile(*reps)
 
 
 def where(condition, a1, a2):
@@ -235,28 +231,26 @@ def where(condition, a1, a2):
 
 
 # TODO: API design. Should I follow pytorch and add a gather?
-def take_along_axis(input: Tensor, indices, axis=-1):
+def take_along_axis(x: Tensor, indices, axis=-1):
     if isinstance(indices, Tensor):
         indices = indices.to_np()  # cut off gradient
-    res = Tensor(
-        np.take_along_axis(input, indices, axis), requires_grad=input.requires_grad
-    )
+    res = Tensor(np.take_along_axis(x, indices, axis), requires_grad=x.requires_grad)
     if res.requires_grad:
-        res.dep = TakeAlongAxis(input, indices, axis)
+        res.dep = TakeAlongAxis(x, indices, axis)
     return res
 
 
 # TODO: Tensor.implement scatter_
 
 
-def topk(input: Tensor, kth, axis=-1, largest=True):
+def topk(x: Tensor, kth, axis=-1, largest=True):
     if largest:
-        indices = np.argpartition(input, input.shape[axis] - kth, axis)
-        indices_idx = [slice(None)] * input.ndim
+        indices = np.argpartition(x, x.shape[axis] - kth, axis)
+        indices_idx = [slice(None)] * x.ndim
         indices_idx[axis] = slice(-kth, None)
     else:
-        indices = np.argpartition(input, kth, axis)
-        indices_idx = [slice(None)] * input.ndim
+        indices = np.argpartition(x, kth, axis)
+        indices_idx = [slice(None)] * x.ndim
         indices_idx[axis] = slice(kth)
     indices = indices[tuple(indices_idx)]
-    return take_along_axis(input, indices, axis), Tensor(indices, requires_grad=False)
+    return take_along_axis(x, indices, axis), Tensor(indices, requires_grad=False)
