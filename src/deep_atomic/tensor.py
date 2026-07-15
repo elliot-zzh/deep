@@ -26,6 +26,9 @@ class Tensor(np.ndarray):
         obj.depended_count = 0  # for topo sorting in backward
         return obj
 
+    def __hash__(self):
+        return id(self)
+
     @property
     def requires_grad(self):
         return self._requires_grad

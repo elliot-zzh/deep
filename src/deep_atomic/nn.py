@@ -75,6 +75,9 @@ class Module(ABC):
             state_dict_ = {**state_dict_, **module.state_dict(prefix=prefix + name)}
         return state_dict_
 
+    # TODO: to be implemented
+    def load_state_dict(self): ...
+
     def modules(self, recurse=True):
         for _name, module in self.named_modules():
             yield module
@@ -82,9 +85,9 @@ class Module(ABC):
     def named_modules(self, prefix="", remove_duplicate=True, memo=None):
         if memo is None:
             memo = set()
-        if id(self) not in memo:
+        if self not in memo:
             if remove_duplicate:
-                memo.add(id(self))
+                memo.add(self)
             yield prefix, self
             if prefix:
                 prefix += "."
@@ -107,10 +110,10 @@ class Module(ABC):
             if module_prefix:
                 module_prefix += "."
             for k, v in members:
-                if id(v) in memo:
+                if v in memo:
                     continue
                 if remove_duplicate:
-                    memo.add(id(v))
+                    memo.add(v)
                 yield module_prefix + k, v
 
     def parameters(self, recurse=True):
