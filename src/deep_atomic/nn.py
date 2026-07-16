@@ -381,4 +381,24 @@ class LogSoftmax(Module):
         return log_softmax(x, self.axis)
 
 
-# TODO: add loss function layers
+class MSELoss(Module):
+    def __init__(self, reduction="mean"):
+        if reduction not in ("none", "sum", "mean"):
+            raise ValueError(f"unsupported argument value {reduction}")
+        self.reduction = reduction
+
+    def forward(self, input_, target):
+        return mse_loss(input_, target, self.reduction)
+
+
+class CrossEntropyLoss(Module):
+    # TODO: support label_smoothing arg
+    def __init__(self, weight=None, ignore_index=-100, reduction="mean"):
+        self.ignore_index = ignore_index
+        self.reduction = reduction
+        self.weight = weight
+
+    def forward(self, input_, target):
+        return cross_entropy(
+            input_, target, self.weight, self.ignore_index, self.reduction
+        )

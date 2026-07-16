@@ -8,6 +8,7 @@ from deep_atomic.nn import (
     Linear,
     Module,
     ModuleList,
+    MSELoss,
     Parameter,
     ParameterList,
     ReLU,
@@ -198,8 +199,8 @@ class TestModule:
             mods = list(outer.modules())
             assert mods == named_mods
 
+    @pytest.mark.parametrize("cls, named, bare", MEMBER_PARAMS)
     class TestModuleNamedMembers:
-        @pytest.mark.parametrize("cls, named, bare", MEMBER_PARAMS)
         def test_flat(self, cls, named, bare):
             class M(Module):
                 def __init__(self):
@@ -216,7 +217,6 @@ class TestModule:
             names = {name for name, _ in result}
             assert names == {"a", "b"}
 
-        @pytest.mark.parametrize("cls, named, bare", MEMBER_PARAMS)
         def test_nested_recurse(self, cls, named, bare):
             class Child(Module):
                 def __init__(self):
@@ -240,7 +240,6 @@ class TestModule:
             names = {name for name, _ in result}
             assert names == {"b", "child.w"}
 
-        @pytest.mark.parametrize("cls, named, bare", MEMBER_PARAMS)
         def test_no_recurse(self, cls, named, bare):
             class Child(Module):
                 def __init__(self):
@@ -264,7 +263,6 @@ class TestModule:
             names = {name for name, _ in result}
             assert names == {"b"}
 
-        @pytest.mark.parametrize("cls, named, bare", MEMBER_PARAMS)
         def test_remove_duplicate(self, cls, named, bare):
             shared = cls(np.array([1.0]))
 
@@ -291,7 +289,6 @@ class TestModule:
             assert names.count("a.m") == 1
             assert "b.m" not in names
 
-        @pytest.mark.parametrize("cls, named, bare", MEMBER_PARAMS)
         def test_bare_matches_named(self, cls, named, bare):
             class Child(Module):
                 def __init__(self):
@@ -315,7 +312,6 @@ class TestModule:
             bare_vals = list(getattr(p, bare)())
             assert bare_vals == named_vals
 
-        @pytest.mark.parametrize("cls, named, bare", MEMBER_PARAMS)
         def test_empty(self, cls, named, bare):
             m = _make_identity_module()
             assert list(getattr(m, named)()) == []
@@ -419,14 +415,13 @@ LIST_PARAMS = [
 ]
 
 
+@pytest.mark.parametrize("list_cls, make_member, _d, _n, auto_convert", LIST_PARAMS)
 class TestListContainers:
-    @pytest.mark.parametrize("list_cls, make_member, _d, _n, _c", LIST_PARAMS)
-    def test_len(self, list_cls, make_member, _d, _n, _c):
+    def test_len(self, list_cls, make_member, _d, _n, auto_convert):
         lst = list_cls([make_member(), make_member()])
         assert len(lst) == 2
 
-    @pytest.mark.parametrize("list_cls, make_member, _d, _n, _c", LIST_PARAMS)
-    def test_getitem(self, list_cls, make_member, _d, _n, _c):
+    def test_getitem(self, list_cls, make_member, _d, _n, auto_convert):
         m0, m1 = make_member(), make_member()
         lst = list_cls([m0, m1])
         assert lst[0] is m0
@@ -438,14 +433,12 @@ class TestListContainers:
         with pytest.raises(IndexError):
             _ = lst[-3]
 
-    @pytest.mark.parametrize("list_cls, make_member, _d, _n, _c", LIST_PARAMS)
-    def test_setitem(self, list_cls, make_member, _d, _n, _c):
+    def test_setitem(self, list_cls, make_member, _d, _n, auto_convert):
         m0, m1 = make_member(), make_member()
         lst = list_cls([m0])
         lst[0] = m1
         assert lst[0] is m1
 
-    @pytest.mark.parametrize("list_cls, make_member, _d, _n, auto_convert", LIST_PARAMS)
     def test_setitem_auto_converts(self, list_cls, make_member, _d, _n, auto_convert):
         if not auto_convert:
             pytest.skip("auto-convert only applies to ParameterList and BufferList")
@@ -454,14 +447,12 @@ class TestListContainers:
         lst[0] = t
         assert isinstance(lst[0], (Parameter, Buffer))
 
-    @pytest.mark.parametrize("list_cls, make_member, _d, _n, _c", LIST_PARAMS)
-    def test_iter(self, list_cls, make_member, _d, _n, _c):
+    def test_iter(self, list_cls, make_member, _d, _n, auto_convert):
         members = [make_member(), make_member()]
         lst = list_cls(members)
         assert list(lst) == members
 
-    @pytest.mark.parametrize("list_cls, make_member, _d, _n, _c", LIST_PARAMS)
-    def test_append(self, list_cls, make_member, _d, _n, _c):
+    def test_append(self, list_cls, make_member, _d, _n, auto_convert):
         m = make_member()
         lst = list_cls([make_member()])
         initial_len = len(lst)
@@ -469,8 +460,7 @@ class TestListContainers:
         assert len(lst) == initial_len + 1
         assert lst[-1] is m
 
-    @pytest.mark.parametrize("list_cls, make_member, _d, _n, _c", LIST_PARAMS)
-    def test_extend(self, list_cls, make_member, _d, _n, _c):
+    def test_extend(self, list_cls, make_member, _d, _n, auto_convert):
         m0, m1 = make_member(), make_member()
         lst = list_cls([make_member()])
         lst.extend([m0, m1])
@@ -478,8 +468,7 @@ class TestListContainers:
         assert lst[1] is m0
         assert lst[2] is m1
 
-    @pytest.mark.parametrize("list_cls, make_member, dict_name, named, _c", LIST_PARAMS)
-    def test_parent_routing(self, list_cls, make_member, dict_name, named, _c):
+    def test_parent_routing(self, list_cls, make_member, _d, _n, auto_convert):
         m = make_member()
 
         class Parent(Module):
@@ -491,7 +480,7 @@ class TestListContainers:
                 return x
 
         p = Parent()
-        entries = dict(getattr(p, named)())
+        entries = dict(getattr(p, _n)())
         assert "items.0" in entries
         assert entries["items.0"] is m
 
@@ -541,15 +530,15 @@ def _softmax_np(z, axis=-1):
     return e / e.sum(axis=axis, keepdims=True)
 
 
-ACTIVATIONS = [
-    (ReLU, _relu_np),
-    (Softmax, _softmax_np),
-]
-
-
+@pytest.mark.parametrize(
+    "act_cls, act_np",
+    [
+        (ReLU, _relu_np),
+        (Softmax, _softmax_np),
+    ],
+)
+@pytest.mark.parametrize("bias", [True, False])
 class TestSequentialWithActivations:
-    @pytest.mark.parametrize("act_cls, act_np", ACTIVATIONS)
-    @pytest.mark.parametrize("bias", [True, False])
     def test_forward(self, act_cls, act_np, bias):
         lin = Linear(3, 5, bias=bias)
         seq = Sequential([lin, act_cls()])
@@ -565,19 +554,20 @@ class TestSequentialWithActivations:
         expected = act_np(z)
         assert_close(expected, out.to_np())
 
-    @pytest.mark.parametrize("act_cls, act_np", ACTIVATIONS)
-    @pytest.mark.parametrize("bias", [True, False])
     def test_grad(self, act_cls, act_np, bias):
         lin = Linear(3, 5, bias=bias)
         seq = Sequential([lin, act_cls()])
+        lossf = MSELoss()
 
         x_np = np.random.randn(2, 3).astype(np.float64)
         x = da.Tensor(x_np, requires_grad=True)
+        y_np = np.random.randn(2, 5).astype(np.float64)
+        y = da.Tensor(y_np, requires_grad=False)
 
-        out = seq(x).sum()
+        out = lossf(seq(x), y)
         out.backward()
 
         def func(inp):
-            return seq(da.Tensor(inp) if not isinstance(inp, da.Tensor) else inp).sum()
+            return da.mse_loss(seq(inp), y)
 
         assert_close(numerical_grad(func, x), x.grad)

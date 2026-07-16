@@ -275,3 +275,42 @@ def topk(x: Tensor, kth, axis=-1, largest=True):
         indices_idx[axis] = slice(kth)
     indices = indices[tuple(indices_idx)]
     return take_along_axis(x, indices, axis), Tensor(indices, requires_grad=False)
+
+
+def mse_loss(input_, target, reduction="mean"):
+    if reduction not in ("none", "sum", "mean"):
+        raise ValueError(f"unsupported argument value {reduction}")
+    if reduction == "none":
+        return (input_ - target) ** 2
+    elif reduction == "sum":
+        return ((input_ - target) ** 2).sum()
+    elif reduction == "mean":
+        return ((input_ - target) ** 2).sum() / input_.size
+
+
+def cross_entropy(input_, target, weight=None, ignore_index=-100, reduction="mean"):
+    # do not support unbatched input
+    # do not support probability target
+    # input shape: (B, C, ...) (B: minibatch dim, C: class dim)
+    # target shape: (B, ...)
+    input_ = log_softmax(input_, axis=1)
+    target_ = where(target == ignore_index, 0, target)  # ensure valid indices
+    input_ = take_along_axis(input_, target_.expand_dims(1), axis=1).squeeze(1)
+    input_ = where(target == ignore_index, 0, input_)
+    if weight is not None:
+        w = weight
+        for i in range(target.ndim - 1):
+            w = w.expand_dims(-1)
+        w = take_along_axis(w, target_.expand_dims(1), axis=1).squeeze(1)
+        input_ *= w
+    input = -input_
+    if reduction == "none":
+        return input
+    if reduction == "sum":
+        return input.sum()
+    if reduction == "mean":
+        input = input.sum()
+        if weight is None:
+            weight = Tensor(np.ones(target.shape), requires_grad=False)
+        weight = where(target == ignore_index, 0, weight)
+        return input / weight.sum()
