@@ -1,13 +1,9 @@
 import numpy as np
 
 
+# TODO: refactor: automatically convert expected & actual to ndarrays if they're tensors
 def assert_close(expected, actual, rtol=5e-05, atol=1e-08):
-    delta = np.abs(actual - expected)
-    tol = atol + rtol * np.abs(expected)
-    if np.isscalar(delta):
-        assert delta <= tol
-    else:
-        assert (delta <= tol).all()
+    assert np.allclose(expected, actual, rtol=rtol, atol=atol)
 
 
 # TODO: more to implement on this utility. handle multi-argument func, handle vector-valued output

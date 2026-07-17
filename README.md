@@ -123,8 +123,8 @@ print(res.grad) # gradient computed!
     - [ ] einsum
     - [ ] normalization
 - [ ] support backward with Vector-Jacobian Product like pytorch
-- [ ] basic neural network modules
-- [ ] optimizers and loss functions
+- [x] basic neural network modules
+- [x] optimizers and loss functions
 - [ ] dataset pipelines
 - [ ] save and load state dict file
 - [ ] full training test
